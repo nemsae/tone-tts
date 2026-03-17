@@ -1,22 +1,15 @@
 <script lang="ts">
-  import type { Session, ScoringResult, GameSettings } from '@/entities/session';
-  import { scoreTwister, getCurrentTwister, advanceSession, addRoundResult, isSessionComplete, calculateAccuracy, saveSession } from '@/entities/session';
-  import type { Twister } from '@/shared/vendor';
+  import { push } from 'svelte-spa-router';
+  import { onMount } from 'svelte';
+  import type { Session, ScoringResult } from '@/entities/session';
+  import { scoreTwister, getCurrentTwister, advanceSession, addRoundResult, isSessionComplete, calculateAccuracy, saveSession, loadSession, clearSession, saveFinalResult } from '@/entities/session';
   import { speechStore } from '@/shared/ui/use-speech';
-  import Modal from '@/shared/ui/Modal.svelte';
+  import { Modal } from '@/shared/ui';
   import GameHud from './GameHud.svelte';
   import TwisterCard from './TwisterCard.svelte';
   import styles from './game-session.module.scss';
 
-  interface Props {
-    session: Session;
-    onSessionChange: (session: Session) => void;
-    onComplete: (result: { accuracy: number; elapsedTime: number }) => void;
-  }
-
-  let { session: initialSession, onSessionChange, onComplete }: Props = $props();
-
-  let session = $state(initialSession);
+  let session = $state<Session | null>(null);
   let scoringResult = $state<ScoringResult | null>(null);
   let liveMatchedWords = $state<boolean[] | undefined>(undefined);
   let liveWordsAttempted = $state<number | undefined>(undefined);
@@ -37,7 +30,17 @@
   let timerInterval: ReturnType<typeof setInterval> | null = null;
   let elapsedTimeRef = 0;
 
-  const currentTwister = $derived(getCurrentTwister(session));
+  onMount(() => {
+    session = loadSession();
+  });
+
+  function handleComplete(result: { accuracy: number; elapsedTime: number }) {
+    saveFinalResult({ accuracy: result.accuracy, elapsedTime: result.elapsedTime });
+    clearSession();
+    push('/game-over');
+  }
+
+  const currentTwister = $derived(session ? getCurrentTwister(session) : null);
 
   const isListening = $derived(speechStore.isListening);
   const transcript = $derived(speechStore.transcript);
@@ -58,7 +61,6 @@
         similarity: result.similarity,
       });
       session = newSession;
-      onSessionChange(newSession);
       saveSession(newSession);
     }
   }
@@ -128,10 +130,9 @@
 
       if (isSessionComplete(nextSession)) {
         const accuracy = calculateAccuracy(nextSession);
-        onComplete({ accuracy, elapsedTime: elapsedTimeRef });
+        handleComplete({ accuracy, elapsedTime: elapsedTimeRef });
       } else {
         session = nextSession;
-        onSessionChange(nextSession);
         saveSession(nextSession);
       }
     }, 500);
@@ -147,7 +148,6 @@
 
     const newSession = addRoundResult(session, { twisterId: currentTwister.id, similarity: 0 });
     session = newSession;
-    onSessionChange(newSession);
     saveSession(newSession);
 
     showSkipModal = false;

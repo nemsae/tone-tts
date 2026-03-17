@@ -19,7 +19,7 @@ const isSpeechSupported =
   (window.SpeechRecognition !== undefined || window.webkitSpeechRecognition !== undefined);
 
 function createSpeechStore() {
-  const { subscribe, set, update } = writable<SpeechState>({
+  const { subscribe, update } = writable<SpeechState>({
     isSupported: isSpeechSupported,
     isListening: false,
     transcript: '',

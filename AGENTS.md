@@ -1,4 +1,4 @@
-This is a React-based web game utilizing Vite, TypeScript, and SCSS. The project strictly follows Feature-Sliced Design (FSD) architecture.
+This is a Svelte-based web game utilizing Vite, TypeScript, and SCSS. The project strictly follows Feature-Sliced Design (FSD) architecture.
 
 Project Structure (FSD)
 
