@@ -2,12 +2,11 @@
   import { push } from 'svelte-spa-router';
   import Icon from '@/shared/ui/Icon.svelte';
 
-  interface Player {
+  interface PlayerScore {
+    id: string;
     name: string;
     accuracy: number;
-    speed: number;
     isYou: boolean;
-    color: 'red' | 'blue' | 'green' | 'yellow';
   }
 
   let sessionId = $state('xj92-k');
@@ -15,11 +14,11 @@
   let currentTwister = $state('Peter Piper picked a peck of pickled peppers.');
   let twisterSubtext = $state('A peck of pickled peppers Peter Piper picked. If Peter Piper picked a peck of pickled peppers, where\'s the peck of pickled peppers Peter Piper picked?');
 
-  let players = $state<Player[]>([
-    { name: 'alex', accuracy: 88, speed: 142, isYou: false, color: 'red' },
-    { name: 'jordan', accuracy: 92, speed: 128, isYou: false, color: 'blue' },
-    { name: 'casey (you)', accuracy: 45, speed: 115, isYou: true, color: 'green' },
-    { name: 'morgan', accuracy: 12, speed: 98, isYou: false, color: 'yellow' },
+  let players = $state<PlayerScore[]>([
+    { id: '1', name: 'alex', accuracy: 88, isYou: false },
+    { id: '2', name: 'jordan', accuracy: 92, isYou: false },
+    { id: '3', name: 'casey (you)', accuracy: 45, isYou: true },
+    { id: '4', name: 'morgan', accuracy: 12, isYou: false },
   ]);
 
   let micActive = $state(true);

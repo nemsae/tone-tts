@@ -1,0 +1,102 @@
+@use '@/app/styles/variables.scss' as vars;
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: vars.$spacing-8;
+}
+
+.container {
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-family: vars.$font-family-headline;
+  margin-bottom: vars.$spacing-12;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: vars.$spacing-8;
+}
+
+.leaderboard {
+  background: vars.$color-surface-container-low;
+  border: 2px solid vars.$color-on-surface;
+  padding: vars.$spacing-8;
+  margin-bottom: vars.$spacing-10;
+}
+
+.leaderboardEntry {
+  display: flex;
+  align-items: center;
+  padding: vars.$spacing-4;
+  background: vars.$color-surface-container-lowest;
+  border: 2px solid vars.$color-on-surface;
+  margin-bottom: vars.$spacing-2;
+
+  &.isYou {
+    background: vars.$color-secondary-fixed;
+  }
+}
+
+.rank {
+  font-size: 1.25rem;
+  font-weight: 700;
+  width: 50px;
+}
+
+.playerInfo {
+  flex: 1;
+  text-align: left;
+}
+
+.playerName {
+  font-weight: 600;
+}
+
+.youBadge {
+  font-size: 0.75rem;
+  color: vars.$color-on-surface-variant;
+  margin-left: vars.$spacing-1;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.accuracy {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: vars.$color-secondary;
+}
+
+.time {
+  font-size: 0.75rem;
+  color: vars.$color-on-surface-variant;
+}
+
+.playAgainButton {
+  width: 100%;
+  padding: vars.$spacing-8 vars.$spacing-12;
+  background: vars.$color-on-surface;
+  border: 2px solid vars.$color-on-surface;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: vars.$color-surface-container-lowest;
+  cursor: pointer;
+  transition: all vars.$transition-fast;
+
+  &:hover {
+    background: vars.$color-surface-container-high;
+  }
+}

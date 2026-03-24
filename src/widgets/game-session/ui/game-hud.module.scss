@@ -1,10 +1,10 @@
-@use '../../../app/styles/variables' as *;
+@use '@/app/styles/variables.scss' as vars;
 
 .hud {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: $spacing-lg;
+  gap: vars.$spacing-lg;
   width: 100%;
   max-width: 600px;
 }
@@ -13,10 +13,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: $spacing-xs;
-  padding: $spacing-lg $spacing-2xl;
-  background: #000000;
-  color: white;
+  gap: vars.$spacing-xs;
+  padding: vars.$spacing-lg vars.$spacing-2xl;
+  background: vars.$color-on-surface;
+  color: vars.$color-surface-container-lowest;
 }
 
 .timerLabel {
@@ -29,25 +29,26 @@
 .timerValue {
   font-size: 3rem;
   font-weight: 700;
-  font-family: $font-family-bold;
+  font-family: vars.$font-family-headline;
+  font-weight: 900;
   font-variant-numeric: tabular-nums;
 }
 
 .info {
   display: flex;
   justify-content: center;
-  gap: $spacing-xl;
+  gap: vars.$spacing-xl;
   width: 100%;
 }
 
 .round {
   font-size: 1.125rem;
   font-weight: 700;
-  color: $color-text-muted;
+  color: vars.$color-on-surface-variant;
 }
 
 .accuracy {
   font-size: 1.125rem;
   font-weight: 700;
-  color: $color-primary;
+  color: vars.$color-primary;
 }

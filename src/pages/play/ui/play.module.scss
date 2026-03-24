@@ -1,0 +1,309 @@
+@use '@/app/styles/variables.scss' as vars;
+
+.page {
+  min-height: 100vh;
+  background-color: vars.$color-background;
+  padding-top: vars.$nav-top-height;
+  overflow: hidden;
+}
+
+.main-content {
+  min-height: calc(100vh - vars.$nav-top-height);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(vars.$nav-bottom-height + 200px);
+
+  @media (min-width: 1024px) {
+    padding-left: vars.$nav-side-width;
+  }
+}
+
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: vars.$spacing-8;
+}
+
+.live-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-1;
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-2;
+}
+
+.live-dot {
+  width: 12px;
+  height: 12px;
+  background-color: vars.$color-primary-fixed;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.live-label {
+  font-family: vars.$font-family-headline;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.round-display {
+  font-family: vars.$font-family-headline;
+  font-size: 3rem;
+  font-weight: 900;
+  font-style: italic;
+  color: vars.$color-primary;
+}
+
+.speed-target {
+  background-color: vars.$color-surface-container-high;
+  padding: vars.$spacing-6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.speed-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: vars.$color-on-surface-variant;
+  margin-bottom: vars.$spacing-1;
+}
+
+.speed-value {
+  font-family: vars.$font-family-headline;
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: vars.$color-tertiary;
+}
+
+.game-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: vars.$spacing-12;
+  text-align: center;
+}
+
+.twister-text {
+  font-family: vars.$font-family-headline;
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: vars.$color-on-surface;
+  max-width: 60rem;
+  margin-bottom: vars.$spacing-8;
+
+  @media (min-width: 768px) {
+    font-size: 5.5rem;
+  }
+
+  .word-red {
+    color: vars.$color-primary-fixed;
+  }
+
+  .word-blue {
+    color: vars.$color-secondary-container;
+  }
+
+  .word-yellow {
+    color: vars.$color-tertiary;
+  }
+}
+
+.color-bars {
+  display: flex;
+  justify-content: center;
+  gap: vars.$spacing-4;
+}
+
+.color-bar {
+  width: 6rem;
+  height: 4px;
+
+  &.red {
+    background-color: vars.$color-primary-fixed;
+  }
+  &.blue {
+    background-color: vars.$color-secondary-container;
+  }
+  &.yellow {
+    background-color: vars.$color-tertiary;
+  }
+  &.gray {
+    background-color: vars.$color-surface-tint;
+  }
+}
+
+.performance-section {
+  position: fixed;
+  bottom: vars.$nav-bottom-height;
+  left: 0;
+  right: 0;
+  z-index: vars.$z-fixed;
+  background-color: vars.$color-surface-container-low;
+  border-top: 8px solid vars.$color-primary-container;
+
+  @media (min-width: 1024px) {
+    left: vars.$nav-side-width;
+  }
+}
+
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.performance-card {
+  padding: vars.$spacing-6;
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-4;
+
+  &:nth-child(2n) {
+    background-color: vars.$color-surface-container-low;
+  }
+
+  &:not(:last-child) {
+    border-right: 1px solid rgba(vars.$color-outline-variant, 0.1);
+  }
+}
+
+.perf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.perf-avatar {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: vars.$font-family-headline;
+  font-weight: 900;
+  font-size: 1.25rem;
+  color: white;
+
+  &.red {
+    background-color: vars.$color-primary;
+  }
+  &.blue {
+    background-color: vars.$color-secondary;
+  }
+  &.yellow {
+    background-color: vars.$color-tertiary-fixed-dim;
+    color: vars.$color-on-tertiary-fixed;
+  }
+  &.green {
+    background-color: #00875a;
+  }
+}
+
+.perf-accuracy {
+  text-align: right;
+}
+
+.perf-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: vars.$color-on-surface-variant;
+}
+
+.perf-value {
+  font-family: vars.$font-family-headline;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.perf-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: vars.$spacing-1;
+}
+
+.perf-name {
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.perf-status {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 1rem;
+  background-color: vars.$color-surface-container-highest;
+}
+
+.progress-fill {
+  height: 100%;
+
+  &.red {
+    background-color: vars.$color-primary;
+  }
+  &.blue {
+    background-color: vars.$color-secondary;
+  }
+  &.yellow {
+    background-color: vars.$color-tertiary-fixed-dim;
+  }
+  &.green {
+    background-color: #00875a;
+  }
+}
+
+.side-indicator {
+  position: fixed;
+  top: calc(vars.$nav-top-height + vars.$spacing-8);
+  right: vars.$spacing-8;
+  width: 8rem;
+  height: 8rem;
+  background-color: vars.$color-surface-container-highest;
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  @media (min-width: 1280px) {
+    display: flex;
+  }
+}
+
+.side-label {
+  font-size: 0.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  opacity: 0.3;
+  transform: rotate(90deg);
+  white-space: nowrap;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

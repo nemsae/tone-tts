@@ -1,35 +1,159 @@
+// Design System Variables - Obsidian & Alabaster (B&W Minimal)
+// Based on Stitch B&W Minimal designs
+
+// Light Theme Colors (Alabaster)
 $color-primary: #000000;
-$color-primary-dark: #000000;
-$color-success: #000000;
-$color-error: #000000;
-$color-warning: #000000;
+$color-primary-container: #3c3b3b;
+$color-on-primary: #e5e2e1;
+$color-on-primary-container: #ffffff;
 
-$color-bg: #ffffff;
-$color-bg-secondary: #ffffff;
-$color-surface: #ffffff;
-$color-text: #000000;
-$color-text-secondary: #000000;
-$color-text-muted: #000000;
-$color-border: #000000;
+$color-secondary: #5f5e5e;
+$color-secondary-container: #d6d4d3;
+$color-on-secondary: #ffffff;
+$color-on-secondary-container: #1b1c1c;
+$color-secondary-fixed: #c8c6c6;
+$color-secondary-fixed-dim: #acabab;
 
-$font-family-base: 'PPMondwest-Regular', system-ui, sans-serif;
-$font-family-bold: 'PPNeueBit-Bold', system-ui, sans-serif;
+$color-tertiary: #3b3b3c;
+$color-tertiary-container: #747474;
+$color-on-tertiary: #e3e2e2;
+$color-on-tertiary-container: #ffffff;
+$color-tertiary-fixed: #5e5e5e;
+$color-tertiary-fixed-dim: #464747;
 
+$color-background: #f9f9f9;
+$color-surface: #f9f9f9;
+$color-surface-bright: #f9f9f9;
+$color-surface-container: #eeeeee;
+$color-surface-container-high: #e8e8e8;
+$color-surface-container-highest: #e2e2e2;
+$color-surface-container-low: #f3f3f3;
+$color-surface-container-lowest: #ffffff;
+$color-surface-dim: #dadada;
+$color-surface-variant: #e2e2e2;
+$color-surface-tint: #5f5e5e;
+
+$color-on-background: #1a1c1c;
+$color-on-surface: #1a1c1c;
+$color-on-surface-variant: #474747;
+
+$color-outline: #777777;
+$color-outline-variant: #c6c6c6;
+
+$color-inverse-surface: #2f3131;
+$color-inverse-on-surface: #f0f1f1;
+$color-inverse-primary: #c8c6c5;
+
+$color-error: #ba1a1a;
+$color-error-container: #ffdad6;
+$color-on-error: #ffffff;
+$color-on-error-container: #410002;
+
+// Dark Theme Colors (Obsidian)
+$color-background-dark: #1a1c1c;
+$color-surface-dark: #1a1c1c;
+$color-surface-container-dark: #2a2a2a;
+$color-surface-container-high-dark: #353535;
+$color-surface-container-highest-dark: #3b3b3b;
+$color-surface-container-low-dark: #222222;
+$color-surface-container-lowest-dark: #121212;
+$color-surface-dim-dark: #dadada;
+$color-surface-variant-dark: #3b3b3b;
+$color-surface-bright-dark: #f9f9f9;
+
+$color-on-background-dark: #f9f9f9;
+$color-on-surface-dark: #f9f9f9;
+$color-on-surface-variant-dark: #c6c6c6;
+$color-on-primary-dark: #e5e2e1;
+$color-on-primary-container-dark: #ffffff;
+$color-primary-dark: #ffffff;
+$color-primary-fixed-dark: #5f5e5e;
+$color-primary-fixed-dim-dark: #474646;
+
+$color-secondary-dark: #c8c6c5;
+$color-secondary-container-dark: #5f5e5e;
+$color-on-secondary-dark: #3b3b3b;
+$color-on-secondary-container-dark: #e2e2e2;
+
+$color-tertiary-dark: #e3e2e2;
+$color-tertiary-container-dark: #747474;
+$color-on-tertiary-dark: #3b3b3b;
+$color-on-tertiary-container-dark: #ffffff;
+
+$color-outline-dark: #919191;
+$color-outline-variant-dark: #474747;
+
+$color-inverse-surface-dark: #e2e2e2;
+$color-inverse-on-surface-dark: #303030;
+$color-inverse-primary-dark: #c8c6c5;
+
+$color-error-dark: #ffb4ab;
+$color-error-container-dark: #93000a;
+$color-on-error-dark: #690005;
+$color-on-error-container-dark: #ffdad6;
+
+// Player Colors (B&W Minimal Accent)
+$color-player-red: #ba1a1a;
+$color-player-blue: #0061a4;
+$color-player-green: #006d3b;
+$color-player-yellow: #6d5e00;
+
+// Typography
+$font-family-headline: 'Inter', system-ui, sans-serif;
+$font-family-body: 'Inter', system-ui, sans-serif;
+$font-family-label: 'Inter', system-ui, sans-serif;
+
+// Spacing Scale (based on 4px base)
 $spacing-xs: 0.25rem;
 $spacing-sm: 0.5rem;
-$spacing-md: 1rem;
-$spacing-lg: 1.5rem;
-$spacing-xl: 2rem;
-$spacing-2xl: 3rem;
+$spacing-md: 0.75rem;
+$spacing-lg: 1rem;
+$spacing-xl: 1.5rem;
+$spacing-2xl: 2rem;
+$spacing-1: 0.25rem;
+$spacing-2: 0.5rem;
+$spacing-3: 0.75rem;
+$spacing-4: 1rem;
+$spacing-5: 1.25rem;
+$spacing-6: 1.5rem;
+$spacing-8: 2rem;
+$spacing-10: 2.5rem;
+$spacing-12: 3rem;
+$spacing-16: 4rem;
+$spacing-20: 5rem;
+$spacing-24: 6rem;
+$spacing-32: 8rem;
 
-$radius-sm: 0;
-$radius-md: 0;
-$radius-lg: 0;
-$radius-xl: 0;
+// Border Radius (Minimal - small rounded corners)
+$radius-sm: 0.125rem;
+$radius-md: 0.25rem;
+$radius-lg: 0.5rem;
+$radius-xl: 0.75rem;
+$radius-full: 0.75rem;
 
+// Shadows (Subtle)
 $shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-$shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-$shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+$shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07);
+$shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.07);
+$shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.07);
+$shadow-nav: 0 -10px 30px rgba(26, 28, 28, 0.03);
 
+// Transitions
 $transition-fast: 150ms ease;
 $transition-normal: 250ms ease;
+$transition-slow: 350ms ease;
+
+// Z-Index Scale
+$z-base: 0;
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-fixed: 300;
+$z-modal-backdrop: 400;
+$z-modal: 500;
+$z-popover: 600;
+$z-tooltip: 700;
+
+// Layout
+$nav-top-height: 80px;
+$nav-side-width: 256px;
+$nav-bottom-height: 96px;

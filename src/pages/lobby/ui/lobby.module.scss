@@ -1,0 +1,411 @@
+@use '@/app/styles/variables.scss' as vars;
+
+.page {
+  min-height: 100vh;
+  background-color: vars.$color-background;
+  padding-top: vars.$nav-top-height;
+}
+
+.main-content {
+  padding: vars.$spacing-12;
+  padding-bottom: calc(vars.$nav-bottom-height + vars.$spacing-12);
+  min-height: calc(100vh - vars.$nav-top-height);
+
+  @media (min-width: 1024px) {
+    padding-left: calc(vars.$nav-side-width + vars.$spacing-12);
+  }
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: vars.$spacing-10;
+  max-width: 75rem;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 8fr 4fr;
+  }
+}
+
+.header {
+  margin-bottom: vars.$spacing-20;
+}
+
+.page-title {
+  font-family: vars.$font-family-headline;
+  font-size: 5rem;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: vars.$color-on-surface;
+  margin-bottom: vars.$spacing-4;
+
+  .accent {
+    color: vars.$color-primary-fixed;
+  }
+}
+
+.title-meta {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-4;
+}
+
+.decorative-line {
+  width: 6rem;
+  height: 4px;
+  background-color: vars.$color-primary-fixed;
+}
+
+.subtitle {
+  font-family: vars.$font-family-headline;
+  font-size: 0.875rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: vars.$color-on-surface;
+  opacity: 0.7;
+}
+
+.players-section {
+  grid-column: 1;
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: vars.$spacing-8;
+}
+
+.section-title {
+  font-family: vars.$font-family-headline;
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: vars.$color-on-surface;
+}
+
+.player-count {
+  font-family: vars.$font-family-headline;
+  font-size: 0.875rem;
+  font-weight: 700;
+  opacity: 0.5;
+}
+
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background-color: rgba(vars.$color-outline-variant, 0.2);
+  border: 1px solid rgba(vars.$color-outline-variant, 0.2);
+}
+
+.player-card {
+  position: relative;
+  background-color: vars.$color-surface-container-lowest;
+  padding: vars.$spacing-8;
+  overflow: hidden;
+
+  &.host {
+    --card-accent: #{vars.$color-primary-fixed};
+  }
+
+  &.ready {
+    --card-accent: #{vars.$color-secondary-container};
+  }
+}
+
+.color-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--card-accent);
+}
+
+.player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: vars.$spacing-6;
+}
+
+.avatar {
+  width: 4rem;
+  height: 4rem;
+  background-color: vars.$color-surface-container-highest;
+  border: 1px solid rgba(vars.$color-outline-variant, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .material-symbols-outlined {
+    font-size: 2.5rem;
+    color: var(--card-accent);
+    font-variation-settings: 'FILL' 1;
+  }
+}
+
+.status-badge {
+  font-size: 0.625rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: vars.$spacing-1 vars.$spacing-3;
+  background-color: vars.$color-surface-container-highest;
+  color: white;
+}
+
+.player-name {
+  font-family: vars.$font-family-headline;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: vars.$color-on-surface;
+  margin-bottom: vars.$spacing-1;
+}
+
+.player-latency {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+}
+
+.invite-section {
+  margin-top: vars.$spacing-10;
+  background-color: vars.$color-surface-container-low;
+  padding: vars.$spacing-10;
+  border: 1px dashed rgba(vars.$color-outline-variant, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: vars.$spacing-6;
+  text-align: center;
+}
+
+.invite-icon {
+  .material-symbols-outlined {
+    font-size: 4rem;
+    opacity: 0.2;
+  }
+}
+
+.invite-title {
+  font-family: vars.$font-family-headline;
+  font-size: 1.125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: vars.$spacing-2;
+}
+
+.invite-desc {
+  font-size: 0.875rem;
+  color: vars.$color-on-surface-variant;
+  max-width: 20rem;
+  opacity: 0.5;
+}
+
+.invite-btn {
+  padding: vars.$spacing-3 vars.$spacing-10;
+  background-color: vars.$color-on-surface;
+  color: vars.$color-surface-container-lowest;
+  font-family: vars.$font-family-headline;
+  font-weight: 900;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  border: none;
+  cursor: pointer;
+  transition: all vars.$transition-fast;
+
+  &:hover {
+    background-color: vars.$color-primary-fixed;
+    color: white;
+  }
+}
+
+.config-section {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-8;
+}
+
+.config-title {
+  font-family: vars.$font-family-headline;
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.config-card {
+  background-color: vars.$color-surface-container-highest;
+  padding: vars.$spacing-8;
+}
+
+.config-label {
+  font-size: 0.625rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  opacity: 0.6;
+  margin-bottom: vars.$spacing-4;
+}
+
+.round-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: vars.$color-background;
+  padding: vars.$spacing-4;
+  border: 1px solid rgba(vars.$color-outline-variant, 0.3);
+}
+
+.round-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all vars.$transition-fast;
+
+  .material-symbols-outlined {
+    font-size: 1.5rem;
+  }
+
+  &:hover {
+    background-color: white;
+    color: vars.$color-on-surface;
+  }
+}
+
+.round-value {
+  font-family: vars.$font-family-headline;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.difficulty-card {
+  border: 1px solid rgba(vars.$color-outline-variant, 0.2);
+}
+
+.difficulty-header {
+  padding: vars.$spacing-8;
+  border-bottom: 1px solid rgba(vars.$color-outline-variant, 0.2);
+}
+
+.difficulty-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: vars.$spacing-2;
+}
+
+.difficulty-btn {
+  padding: vars.$spacing-3;
+  font-family: vars.$font-family-headline;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  border: 1px solid rgba(vars.$color-outline-variant, 0.2);
+  background: transparent;
+  cursor: pointer;
+  transition: all vars.$transition-fast;
+
+  &:hover {
+    background-color: white;
+    color: vars.$color-on-surface;
+  }
+
+  &.active {
+    background-color: vars.$color-primary;
+    color: white;
+    border-color: vars.$color-primary;
+  }
+
+  &.disabled {
+    opacity: 0.4;
+  }
+}
+
+.theme-selector {
+  padding: vars.$spacing-8;
+}
+
+.theme-select {
+  width: 100%;
+  background-color: vars.$color-background;
+  border: 1px solid rgba(vars.$color-outline-variant, 0.3);
+  padding: vars.$spacing-4;
+  font-family: vars.$font-family-headline;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  appearance: none;
+  cursor: pointer;
+  transition: all vars.$transition-fast;
+
+  &:focus {
+    box-shadow: inset 0 -2px 0 vars.$color-primary-fixed;
+  }
+}
+
+.start-btn {
+  width: 100%;
+  padding: vars.$spacing-8;
+  background-color: vars.$color-primary;
+  color: vars.$color-on-primary-container;
+  font-family: vars.$font-family-headline;
+  font-weight: 900;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all vars.$transition-fast;
+
+  .btn-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, white, rgba(198, 198, 198, 1));
+    opacity: 0;
+    transition: opacity vars.$transition-fast;
+  }
+
+  .btn-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-arrow {
+    position: absolute;
+    right: vars.$spacing-8;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform vars.$transition-fast;
+
+    .material-symbols-outlined {
+      font-size: 2.5rem;
+    }
+  }
+
+  &:hover {
+    .btn-bg {
+      opacity: 1;
+    }
+
+    .btn-arrow {
+      transform: translateY(-50%) translateX(4px);
+    }
+  }
+}

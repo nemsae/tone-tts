@@ -1,0 +1,83 @@
+.lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  gap: 1.5rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+}
+
+.roomCode {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  margin: 0.5rem 0;
+  padding: 0.5rem 1rem;
+  border: 3px solid #000;
+  display: inline-block;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.playersSection {
+  width: 100%;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.startButton {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  background: #000;
+  color: #fff;
+}
+
+.startButton:hover {
+  background: #333;
+}
+
+.leaveButton {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.waiting {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.error {
+  background: #fee;
+  border: 2px solid #c00;
+  padding: 0.75rem;
+  border-radius: 4px;
+  color: #c00;
+  text-align: center;
+  width: 100%;
+}

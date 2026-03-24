@@ -1,20 +1,20 @@
-@use '../../../app/styles/variables' as *;
+@use '@/app/styles/variables.scss' as vars;
 
 .card {
-  background: $color-surface;
-  border: 2px solid #000000;
-  padding: $spacing-xl;
+  background: vars.$color-surface;
+  border: 2px solid vars.$color-on-surface;
+  padding: vars.$spacing-xl;
   max-width: 600px;
   width: 100%;
-  box-shadow: 8px 8px 0 #000000;
+  box-shadow: 8px 8px 0 vars.$color-on-surface;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: $spacing-lg;
-  gap: $spacing-sm;
+  margin-bottom: vars.$spacing-lg;
+  gap: vars.$spacing-sm;
   min-width: 0;
 }
 
@@ -23,10 +23,10 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: $color-primary;
-  background: #ffffff;
-  border: 2px solid #000000;
-  padding: $spacing-xs $spacing-sm;
+  color: vars.$color-primary;
+  background: vars.$color-surface-container-lowest;
+  border: 2px solid vars.$color-on-surface;
+  padding: vars.$spacing-xs vars.$spacing-sm;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -36,7 +36,7 @@
 .difficulty {
   font-size: 0.875rem;
   font-weight: 700;
-  color: $color-text-muted;
+  color: vars.$color-on-surface-variant;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -44,31 +44,32 @@
 
 .text {
   font-size: 1.5rem;
-  font-family: $font-family-bold;
+  font-family: vars.$font-family-headline;
+  font-weight: 900;
   line-height: 1.6;
   text-align: center;
-  color: $color-text;
+  color: vars.$color-on-surface;
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
 .word {
   transition:
-    color $transition-fast,
-    background $transition-fast;
+    color vars.$transition-fast,
+    background vars.$transition-fast;
   padding: 2px 4px;
   border: 2px solid transparent;
   box-sizing: border-box;
 
   &.matched {
-    color: #000000;
-    background: #ffffff;
-    border-color: #000000;
+    color: vars.$color-on-surface;
+    background: vars.$color-surface-container-lowest;
+    border-color: vars.$color-on-surface;
   }
 
   &.unmatched {
-    color: #ffffff;
-    background: #000000;
-    border-color: #000000;
+    color: vars.$color-surface-container-lowest;
+    background: vars.$color-on-surface;
+    border-color: vars.$color-on-surface;
   }
 }

@@ -1,89 +1,418 @@
-@use '../../../app/styles/variables' as *;
+@use '@/app/styles/variables.scss' as vars;
 
 .page {
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: $spacing-xl;
+  background-color: vars.$color-background;
+  padding-top: vars.$nav-top-height;
 }
 
-.container {
-  text-align: center;
-  max-width: 500px;
+.main-content {
+  padding: vars.$spacing-12;
+  padding-bottom: calc(vars.$nav-bottom-height + vars.$spacing-12);
+  max-width: 80rem;
+  margin: 0 auto;
+
+  @media (min-width: 1024px) {
+    padding-left: calc(vars.$nav-side-width + vars.$spacing-12);
+  }
+}
+
+.hero-section {
+  margin-bottom: vars.$spacing-20;
 }
 
 .title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  font-family: $font-family-bold;
-  color: $color-text;
-  margin-bottom: $spacing-xl;
+  font-family: vars.$font-family-headline;
+  font-size: 5rem;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: vars.$color-on-surface;
+  margin-bottom: vars.$spacing-4;
+
+  @media (min-width: 768px) {
+    font-size: 7rem;
+  }
 }
 
-.scoreCard {
-  background: $color-surface;
-  border: 2px solid #000000;
-  padding: $spacing-2xl;
-  margin-bottom: $spacing-xl;
-  box-shadow: 8px 8px 0 #000000;
-}
-
-.scoreLabel {
-  font-size: 1rem;
-  color: $color-text-muted;
-  margin-bottom: $spacing-sm;
-}
-
-.scoreValue {
-  font-size: 4rem;
-  font-weight: 700;
-  font-family: $font-family-bold;
-  color: $color-primary;
-}
-
-.maxScore {
-  font-size: 1.25rem;
-  color: $color-text-muted;
-}
-
-.message {
-  font-size: 1.125rem;
-  color: $color-text;
-  margin-bottom: $spacing-2xl;
-}
-
-.buttons {
+.hero-meta {
   display: flex;
-  gap: $spacing-md;
-  justify-content: center;
+  flex-direction: column;
+  gap: vars.$spacing-8;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
 }
 
-.playAgainButton,
-.homeButton {
-  padding: $spacing-md $spacing-xl;
+.hero-subtitle {
+  font-family: vars.$font-family-headline;
+  font-size: 1.25rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: vars.$color-on-surface-variant;
+  max-width: 30rem;
+  line-height: 1.6;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: vars.$spacing-4;
+  background-color: vars.$color-primary-fixed;
+  color: vars.$color-on-primary-container;
+  padding: vars.$spacing-4 vars.$spacing-8;
+  font-family: vars.$font-family-headline;
+  font-weight: 900;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+
+  .material-symbols-outlined {
+    font-size: 1.5rem;
+  }
+}
+
+.podium-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-bottom: vars.$spacing-32;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 3fr 6fr 3fr;
+  }
+}
+
+.podium-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: vars.$spacing-8;
+  min-height: 25rem;
+  overflow: hidden;
+
+  &.second {
+    background-color: vars.$color-surface-container-low;
+    border-right: 1px solid rgba(vars.$color-outline-variant, 0.2);
+
+    .color-bar {
+      background-color: vars.$color-secondary-container;
+    }
+    .avatar {
+      background-color: vars.$color-secondary-container;
+    }
+  }
+
+  &.first {
+    background-color: vars.$color-surface-container-lowest;
+    z-index: 10;
+    margin-top: -4rem;
+    padding: vars.$spacing-12;
+    min-height: 30rem;
+    box-shadow: 0 40px 100px -20px rgba(vars.$color-primary-fixed, 0.15);
+
+    .color-bar {
+      background-color: vars.$color-primary-fixed;
+      width: 8px;
+    }
+    .avatar {
+      background-color: vars.$color-primary-fixed;
+    }
+  }
+
+  &.third {
+    background-color: vars.$color-surface-container-low;
+    border-left: 1px solid rgba(vars.$color-outline-variant, 0.2);
+
+    .color-bar {
+      background-color: vars.$color-tertiary;
+    }
+    .avatar {
+      background-color: vars.$color-tertiary;
+      color: vars.$color-on-tertiary;
+    }
+  }
+}
+
+.color-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.rank-number {
+  position: absolute;
+  top: vars.$spacing-4;
+  right: vars.$spacing-4;
+  font-family: vars.$font-family-headline;
+  font-size: 6rem;
+  font-weight: 900;
+  opacity: 0.1;
+  line-height: 1;
+}
+
+.avatar {
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: vars.$spacing-6;
+
+  .material-symbols-outlined {
+    font-size: 2.5rem;
+    color: white;
+  }
+}
+
+.crown-icon {
+  position: absolute;
+  top: vars.$spacing-8;
+  right: vars.$spacing-8;
+
+  .material-symbols-outlined {
+    font-size: 4rem;
+    color: vars.$color-primary-fixed;
+    font-variation-settings: 'FILL' 1;
+  }
+}
+
+.player-name {
+  font-family: vars.$font-family-headline;
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin-bottom: vars.$spacing-1;
+}
+
+.player-score {
+  font-family: vars.$font-family-headline;
+  color: vars.$color-secondary-container;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: vars.$spacing-6;
+}
+
+.champion-name {
+  font-size: 4rem;
+}
+
+.champion-score {
+  color: vars.$color-primary-fixed;
+  font-size: 3rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(vars.$color-outline-variant, 0.3);
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: vars.$color-secondary-container;
+}
+
+.champion-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid rgba(vars.$color-outline-variant, 0.3);
+  padding-top: vars.$spacing-8;
+}
+
+.accuracy-label {
+  font-family: vars.$font-family-body;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: vars.$color-on-surface-variant;
+}
+
+.accuracy-value {
+  font-family: vars.$font-family-headline;
   font-size: 1rem;
   font-weight: 700;
-  transition: all $transition-fast;
+  color: vars.$color-primary-fixed;
 }
 
-.playAgainButton {
-  background: $color-primary;
-  color: white;
+.xp-badge {
+  text-align: right;
+  font-family: vars.$font-family-headline;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-style: italic;
+  color: vars.$color-on-surface;
+}
 
-  &:hover {
-    background: $color-primary-dark;
-    box-shadow: 4px 4px 0 #000000;
+.matrix-section {
+  margin-bottom: vars.$spacing-32;
+}
+
+.matrix-header {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-4;
+  margin-bottom: vars.$spacing-12;
+}
+
+.matrix-line {
+  flex: 1;
+  height: 1px;
+  background-color: vars.$color-outline-variant;
+}
+
+.matrix-title {
+  font-family: vars.$font-family-headline;
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: vars.$spacing-8;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
   }
 }
 
-.homeButton {
-  background: $color-surface;
-  border: 2px solid $color-border;
-  color: $color-text;
+.stat-card {
+  background-color: vars.$color-surface-container-lowest;
+  padding: vars.$spacing-8;
+  border-left: 4px solid;
+
+  &.primary {
+    border-color: vars.$color-primary;
+  }
+  &.accent {
+    border-color: vars.$color-primary-fixed;
+  }
+  &.secondary {
+    border-color: vars.$color-secondary-container;
+  }
+  &.tertiary {
+    border-color: vars.$color-tertiary;
+  }
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: vars.$color-on-surface-variant;
+  margin-bottom: vars.$spacing-4;
+}
+
+.stat-value {
+  font-family: vars.$font-family-headline;
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin-bottom: vars.$spacing-2;
+}
+
+.stat-trend {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-1;
+  font-size: 0.875rem;
+  font-weight: 700;
+
+  .material-symbols-outlined {
+    font-size: 1rem;
+  }
+
+  &.up {
+    color: vars.$color-tertiary;
+  }
+}
+
+.leaderboard {
+  width: 100%;
+}
+
+.leaderboard-table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+.table-header {
+  font-family: vars.$font-family-headline;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: vars.$color-on-surface-variant;
+  border-bottom: 1px solid rgba(vars.$color-outline-variant, 0.3);
+}
+
+.table-header th {
+  padding: vars.$spacing-6 vars.$spacing-4;
+}
+
+.table-body tr {
+  transition: background-color vars.$transition-fast;
 
   &:hover {
-    background: #000000;
-    color: #ffffff;
+    background-color: vars.$color-surface-container-high;
   }
+}
+
+.table-body td {
+  padding: vars.$spacing-8 vars.$spacing-4;
+}
+
+.rank-cell {
+  font-family: vars.$font-family-headline;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.player-cell {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-4;
+}
+
+.player-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: vars.$color-surface-variant;
+}
+
+.player-name-cell {
+  font-family: vars.$font-family-headline;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.table-cell {
+  text-align: right;
+  font-family: vars.$font-family-headline;
+  color: vars.$color-on-surface-variant;
+}
+
+.score-cell {
+  font-family: vars.$font-family-headline;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-align: right;
 }
