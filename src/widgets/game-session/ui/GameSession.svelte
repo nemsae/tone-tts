@@ -25,12 +25,17 @@
   let autoCheckDelay = DEFAULT_AUTO_CHECK_DELAY;
   let autoCheckEnabled = true;
   let autoCheckTimer: ReturnType<typeof setTimeout> | null = null;
-  let wasListening = false;
   let timerInterval: ReturnType<typeof setInterval> | null = null;
   let elapsedTimeRef = 0;
 
+  let speechState = $state({ isListening: false, transcript: '', error: null as string | null });
+
   onMount(() => {
     session = loadSession();
+    const unsubscribe = speechStore.subscribe((state) => {
+      speechState = state;
+    });
+    return unsubscribe;
   });
 
   function handleComplete(result: { accuracy: number; elapsedTime: number }) {
@@ -41,17 +46,10 @@
 
   const currentTwister = $derived(session ? getCurrentTwister(session) : null);
 
-  const isListening = $derived(speechStore.isListening);
-  const transcript = $derived(speechStore.transcript);
-  const error = $derived(speechStore.error);
-  const startListening = speechStore.startListening;
-  const stopListening = speechStore.stopListening;
-  const clearTranscript = speechStore.clearTranscript;
-
   function handleScore() {
-    if (!currentTwister || !transcript) return;
+    if (!currentTwister || !speechState.transcript) return;
 
-    const result = scoreTwister(transcript, currentTwister.text);
+    const result = scoreTwister(speechState.transcript, currentTwister.text);
     scoringResult = result;
 
     if (result.isMatch) {
@@ -65,33 +63,39 @@
   }
 
   $effect(() => {
-    if (!isListening) {
+    const currentSpeechState = speechState;
+    const listening = currentSpeechState.isListening;
+    const text = currentSpeechState.transcript;
+    const shouldCheck = autoCheckEnabled && autoCheckDelay > 0;
+
+    if (!listening) {
       liveMatchedWords = undefined;
       liveWordsAttempted = undefined;
+      if (autoCheckTimer) {
+        clearTimeout(autoCheckTimer);
+        autoCheckTimer = null;
+      }
       return;
     }
 
-    if (wasListening && transcript && autoCheckEnabled && autoCheckDelay > 0) {
+    if (text && shouldCheck) {
+      if (autoCheckTimer) {
+        clearTimeout(autoCheckTimer);
+      }
       autoCheckTimer = setTimeout(() => {
         handleScore();
       }, autoCheckDelay);
     }
-
-    wasListening = isListening;
-
-    return () => {
-      if (autoCheckTimer) {
-        clearTimeout(autoCheckTimer);
-      }
-    };
   });
 
   $effect(() => {
-    if (!currentTwister || !transcript) {
+    const twister = currentTwister;
+    const text = speechState.transcript;
+    if (!twister || !text) {
       return;
     }
 
-    const result = scoreTwister(transcript, currentTwister.text);
+    const result = scoreTwister(text, twister.text);
     liveMatchedWords = result.matchedWords;
     liveWordsAttempted = result.wordsAttempted;
   });
@@ -117,12 +121,13 @@
     scoringResult = null;
     liveMatchedWords = undefined;
     liveWordsAttempted = undefined;
-    wasListening = false;
     if (autoCheckTimer) {
       clearTimeout(autoCheckTimer);
+      autoCheckTimer = null;
     }
 
-    clearTranscript();
+    speechStore.stopListening();
+    speechStore.clearTranscript();
 
     setTimeout(() => {
       const nextSession = advanceSession(sessionToAdvance);
@@ -133,6 +138,7 @@
       } else {
         session = nextSession;
         saveSession(nextSession);
+        speechStore.startListening();
       }
     }, 500);
   }
@@ -183,13 +189,13 @@
   function handleStartGame() {
     gameStartTime = Date.now();
     gameStarted = true;
-    startListening();
+    speechStore.startListening();
   }
 
   function handlePause() {
     isPaused = true;
     pauseStartTime = Date.now();
-    stopListening();
+    speechStore.stopListening();
   }
 
   function handleResume() {
@@ -198,7 +204,7 @@
     }
     isPaused = false;
     pauseStartTime = null;
-    startListening();
+    speechStore.startListening();
   }
 </script>
 
@@ -259,11 +265,11 @@
 
         <div class={styles.controls}>
           <div class={styles.transcript}>
-            {transcript || (isListening ? 'Listening...' : 'Press the button and speak')}
+            {speechState.transcript || (speechState.isListening ? 'Listening...' : 'Press the button and speak')}
           </div>
 
-          {#if error}
-            <div class={styles.error}>{error}</div>
+          {#if speechState.error}
+            <div class={styles.error}>{speechState.error}</div>
           {/if}
 
           {#if scoringResult}
@@ -277,8 +283,8 @@
           {/if}
 
           <div class={styles.buttons}>
-            {#if !isListening}
-              <button class={styles.micButton} onclick={startListening}>
+            {#if !speechState.isListening}
+              <button class={styles.micButton} onclick={() => speechStore.startListening()}>
                 Start Listening
               </button>
             {:else}

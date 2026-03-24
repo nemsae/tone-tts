@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 const UNSUPPORTED_ERROR_MESSAGE = 'Speech recognition is not supported in this browser.';
 const PERMISSION_ERROR_MESSAGE =
@@ -19,7 +19,7 @@ const isSpeechSupported =
   (window.SpeechRecognition !== undefined || window.webkitSpeechRecognition !== undefined);
 
 function createSpeechStore() {
-  const { subscribe, update } = writable<SpeechState>({
+  const store = writable<SpeechState>({
     isSupported: isSpeechSupported,
     isListening: false,
     transcript: '',
@@ -31,14 +31,25 @@ function createSpeechStore() {
   function createRecognitionHandlers() {
     return {
       onresult: (event: SpeechRecognitionEvent) => {
-        const chunks: string[] = [];
-        for (let index = event.resultIndex; index < event.results.length; index += 1) {
-          chunks.push(event.results[index][0].transcript);
+        let finalTranscript = '';
+        let interimTranscript = '';
+
+        for (let index = 0; index < event.results.length; index += 1) {
+          const result = event.results[index];
+          if (result.isFinal) {
+            finalTranscript += result[0].transcript;
+          } else {
+            interimTranscript += result[0].transcript;
+          }
         }
-        update((state) => ({ ...state, transcript: chunks.join(' ').trim() }));
+
+        const combinedTranscript = (finalTranscript || interimTranscript).trim();
+        if (combinedTranscript) {
+          store.update((state) => ({ ...state, transcript: combinedTranscript }));
+        }
       },
       onerror: (event: SpeechRecognitionErrorEvent) => {
-        console.error('Speech recognition error:', event, event.error);
+        console.error('Speech recognition error:', event.error);
         let errorMsg = '';
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
           errorMsg = PERMISSION_ERROR_MESSAGE;
@@ -46,13 +57,15 @@ function createSpeechStore() {
           errorMsg = NETWORK_ERROR_MESSAGE;
         } else if (event.error === 'no-speech') {
           errorMsg = NO_SPEECH_ERROR_MESSAGE;
+        } else if (event.error === 'aborted') {
+          return;
         } else {
           errorMsg = `Speech recognition error: ${event.error}.`;
         }
-        update((state) => ({ ...state, error: errorMsg, isListening: false }));
+        store.update((state) => ({ ...state, error: errorMsg, isListening: false }));
       },
       onend: () => {
-        update((state) => ({ ...state, isListening: false }));
+        store.update((state) => ({ ...state, isListening: false }));
       },
     };
   }
@@ -76,21 +89,21 @@ function createSpeechStore() {
 
   function startListening() {
     if (recognition === null) {
-      update((state) => ({ ...state, error: UNSUPPORTED_ERROR_MESSAGE }));
+      store.update((state) => ({ ...state, error: UNSUPPORTED_ERROR_MESSAGE }));
       return;
     }
 
-    update((state) => ({ ...state, error: null }));
+    store.update((state) => ({ ...state, error: null }));
 
     try {
       recognition.start();
-      update((state) => ({ ...state, isListening: true }));
+      store.update((state) => ({ ...state, isListening: true }));
     } catch (startError) {
       if (startError instanceof DOMException && startError.name === 'InvalidStateError') {
         return;
       }
 
-      update((state) => ({
+      store.update((state) => ({
         ...state,
         error: 'Could not start microphone capture. Please try again.',
         isListening: false,
@@ -100,12 +113,12 @@ function createSpeechStore() {
 
   function stopListening() {
     recognition?.stop();
-    update((state) => ({ ...state, isListening: false }));
+    store.update((state) => ({ ...state, isListening: false }));
   }
 
   function restartRecognition() {
     recognition?.stop();
-    update((state) => ({ ...state, transcript: '', isListening: false, error: null }));
+    store.update((state) => ({ ...state, transcript: '', isListening: false, error: null }));
 
     if (!isSpeechSupported) {
       return;
@@ -124,12 +137,12 @@ function createSpeechStore() {
 
     try {
       recognition.start();
-      update((state) => ({ ...state, isListening: true }));
+      store.update((state) => ({ ...state, isListening: true }));
     } catch (startError) {
       if (startError instanceof DOMException && startError.name === 'InvalidStateError') {
         return;
       }
-      update((state) => ({
+      store.update((state) => ({
         ...state,
         error: 'Could not start microphone capture. Please try again.',
         isListening: false,
@@ -138,29 +151,18 @@ function createSpeechStore() {
   }
 
   function clearError() {
-    update((state) => ({ ...state, error: null }));
+    store.update((state) => ({ ...state, error: null }));
   }
 
   function clearTranscript() {
-    update((state) => ({ ...state, transcript: '' }));
+    store.update((state) => ({ ...state, transcript: '' }));
   }
 
   init();
 
   return {
-    subscribe,
-    get isSupported() {
-      return get({ subscribe }).isSupported;
-    },
-    get isListening() {
-      return get({ subscribe }).isListening;
-    },
-    get transcript() {
-      return get({ subscribe }).transcript;
-    },
-    get error() {
-      return get({ subscribe }).error;
-    },
+    subscribe: store.subscribe,
+    isSupported: isSpeechSupported,
     startListening,
     stopListening,
     restartRecognition,
