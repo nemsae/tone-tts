@@ -1,0 +1,258 @@
+@use '../../../app/styles/variables' as *;
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: $spacing-xl;
+}
+
+.loading {
+  font-size: 1.25rem;
+  color: $color-text-muted;
+}
+
+.gameContainer {
+  max-width: 800px;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+}
+
+.leaveButton {
+  padding: $spacing-sm $spacing-md;
+  background: $color-surface;
+  border: 2px solid $color-border;
+  color: $color-text;
+  font-size: 0.875rem;
+  cursor: pointer;
+
+  &:hover {
+    background: #000000;
+    color: #ffffff;
+  }
+}
+
+.pauseButton {
+  padding: $spacing-sm $spacing-md;
+  background: $color-surface;
+  border: 2px solid $color-border;
+  color: $color-text;
+  font-size: 0.875rem;
+  cursor: pointer;
+
+  &:hover {
+    background: #000000;
+    color: #ffffff;
+  }
+}
+
+.timer {
+  text-align: center;
+}
+
+.timerLabel {
+  display: block;
+  font-size: 0.75rem;
+  color: $color-text-muted;
+}
+
+.timerValue {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: $font-family-bold;
+}
+
+.playersRow {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+  flex-wrap: wrap;
+}
+
+.playerCard {
+  flex: 1;
+  min-width: 120px;
+  padding: $spacing-md;
+  background: $color-surface;
+  border: 2px solid $color-border;
+  text-align: center;
+
+  &.myCard {
+    border-color: $color-primary;
+    box-shadow: 4px 4px 0 $color-primary;
+  }
+}
+
+.playerName {
+  display: block;
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: $spacing-xs;
+}
+
+.playerScore {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: $font-family-bold;
+  color: $color-primary;
+}
+
+.twisterSection {
+  margin-bottom: $spacing-xl;
+}
+
+.twisterCard {
+  background: $color-surface;
+  border: 2px solid #000000;
+  padding: $spacing-2xl;
+  margin-bottom: $spacing-md;
+  box-shadow: 8px 8px 0 #000000;
+}
+
+.twisterHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.twisterTopic {
+  font-size: 0.875rem;
+  color: $color-text-muted;
+}
+
+.twisterDifficulty {
+  font-size: 0.875rem;
+  padding: 2px 8px;
+  background: #000000;
+  color: #ffffff;
+}
+
+.twisterText {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.countdown {
+  text-align: center;
+  padding: $spacing-md;
+  background: $color-surface;
+  border: 2px solid #000000;
+}
+
+.countdownLabel {
+  display: block;
+  font-size: 0.75rem;
+  color: $color-text-muted;
+}
+
+.countdownValue {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: $font-family-bold;
+  color: $color-primary;
+}
+
+.controls {
+  text-align: center;
+}
+
+.transcript {
+  padding: $spacing-lg;
+  background: $color-surface;
+  border: 2px solid $color-border;
+  font-size: 1.125rem;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-md;
+}
+
+.buttons {
+  display: flex;
+  gap: $spacing-md;
+  justify-content: center;
+}
+
+.micButton {
+  padding: $spacing-lg $spacing-2xl;
+  background: #000000;
+  border: 2px solid #000000;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 0 #000000;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.listening {
+    background: #ff0000;
+    border-color: #ff0000;
+    animation: pulse 1s infinite;
+  }
+}
+
+.submitButton {
+  padding: $spacing-lg $spacing-2xl;
+  background: #000000;
+  border: 2px solid #000000;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 0 #000000;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.submittedMessage {
+  padding: $spacing-lg;
+  background: #000000;
+  color: #ffffff;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.error {
+  padding: $spacing-md;
+  background: #ffffff;
+  border: 2px solid #000000;
+  color: #000000;
+  font-size: 0.875rem;
+  margin-top: $spacing-md;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
