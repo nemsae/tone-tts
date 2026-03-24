@@ -1,9 +1,15 @@
 import path from 'node:path';
-import react from '@vitejs/plugin-react';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    svelte({
+      compilerOptions: {
+        dev: true,
+      },
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
@@ -13,6 +19,6 @@ export default defineConfig({
     environment: 'jsdom',
     globals: false,
     setupFiles: './src/shared/testing/setup-tests.ts',
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    include: ['src/**/*.test.ts', 'src/**/*.test.svelte'],
   },
 });

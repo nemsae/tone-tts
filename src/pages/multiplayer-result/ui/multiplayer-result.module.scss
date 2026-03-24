@@ -1,0 +1,138 @@
+@use '../../../app/styles/variables' as *;
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: $spacing-xl;
+}
+
+.container {
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-family: $font-family-bold;
+  color: $color-text;
+  margin-bottom: $spacing-xl;
+}
+
+.roomCodeDisplay {
+  margin-bottom: $spacing-xl;
+}
+
+.roomCodeLabel {
+  display: block;
+  font-size: 0.875rem;
+  color: $color-text-muted;
+}
+
+.roomCode {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: $font-family-bold;
+  letter-spacing: 0.3em;
+  color: $color-primary;
+}
+
+.leaderboard {
+  background: $color-surface;
+  border: 2px solid #000000;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-2xl;
+  box-shadow: 8px 8px 0 #000000;
+}
+
+.leaderboardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: $spacing-lg;
+  color: $color-text;
+}
+
+.leaderboardItem {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: $spacing-md;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 1px solid $color-border;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.firstPlace {
+    background: #fffde7;
+    margin: 0 (-$spacing-lg);
+    padding: $spacing-md $spacing-lg;
+  }
+}
+
+.rank {
+  font-size: 1.25rem;
+}
+
+.playerName {
+  font-weight: 700;
+  text-align: left;
+}
+
+.playerAccuracy {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: $font-family-bold;
+  color: $color-primary;
+}
+
+.playerTime {
+  font-size: 0.875rem;
+  color: $color-text-muted;
+}
+
+.noResults {
+  padding: $spacing-2xl;
+  background: $color-surface;
+  border: 2px solid $color-border;
+  margin-bottom: $spacing-2xl;
+}
+
+.buttons {
+  display: flex;
+  gap: $spacing-md;
+  justify-content: center;
+}
+
+.playAgainButton,
+.homeButton {
+  padding: $spacing-md $spacing-xl;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: all $transition-fast;
+}
+
+.playAgainButton {
+  background: $color-primary;
+  color: white;
+
+  &:hover {
+    background: $color-primary-dark;
+    box-shadow: 4px 4px 0 #000000;
+  }
+}
+
+.homeButton {
+  background: $color-surface;
+  border: 2px solid $color-border;
+  color: $color-text;
+
+  &:hover {
+    background: #000000;
+    color: #ffffff;
+  }
+}
