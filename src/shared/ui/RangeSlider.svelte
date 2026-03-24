@@ -2,6 +2,7 @@
   interface Props {
     min?: number;
     max?: number;
+    step?: number;
     value?: number;
     showLabels?: boolean;
     oninput?: (e: Event) => void;
@@ -11,6 +12,7 @@
   let {
     min = 0,
     max = 100,
+    step = 1,
     value = $bindable(50),
     showLabels = true,
     oninput,
@@ -24,6 +26,7 @@
     class="range-slider"
     {min}
     {max}
+    {step}
     bind:value
     {oninput}
   />
