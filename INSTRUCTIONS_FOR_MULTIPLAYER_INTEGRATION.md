@@ -20,9 +20,10 @@ This document provides exhaustive specifications for integrating a Svelte UI wit
 ## Architecture Overview
 
 ### Technology Stack
+
 - **Runtime**: Node.js with TypeScript
 - **Real-time Communication**: Socket.io v4
-- **AI/ML**: OpenAI SDK (GPT-o3-mini) for twister generation
+- **Twister Generation**: API endpoint (/api/generate) for twister generation
 - **Server Port**: 3001 (default), configurable via `PORT` environment variable
 - **Client URL**: http://localhost:5173 (default), configurable via `CLIENT_URL` environment variable
 
@@ -40,6 +41,7 @@ const io = new Server(httpServer, {
 ```
 
 ### Game Constraints
+
 - **Max Players**: 4 per room
 - **Round Time Limit**: 30,000ms (30 seconds)
 - **Auto-Advance Delay**: 2,000ms (2 seconds after all players submit)
@@ -49,6 +51,7 @@ const io = new Server(httpServer, {
 ## Connection Setup
 
 ### Server URL
+
 ```
 VITE_SOCKET_URL=http://localhost:3001
 ```
@@ -122,14 +125,15 @@ Configuration passed when creating a room.
 
 ```typescript
 interface GameSettings {
-  topic: string;           // Topic for tongue twisters (e.g., "animals", "food", "colors")
-  length: TwisterLength;    // 'short' (~5 words), 'medium' (~10 words), 'long' (~20 words), 'custom'
-  customLength?: number;    // Required when length='custom', specifies exact word count
-  rounds: number;           // Number of rounds to play (maps to number of twisters generated)
+  topic: string; // Topic for tongue twisters (e.g., "animals", "food", "colors")
+  length: TwisterLength; // 'short' (~5 words), 'medium' (~10 words), 'long' (~20 words), 'custom'
+  customLength?: number; // Required when length='custom', specifies exact word count
+  rounds: number; // Number of rounds to play (maps to number of twisters generated)
 }
 ```
 
 **Validation Rules:**
+
 - `topic`: Must be non-empty string
 - `rounds`: Must be positive integer
 - If `length === 'custom'`, `customLength` is required and must be positive integer
@@ -140,11 +144,11 @@ Generated tongue twister data.
 
 ```typescript
 interface Twister {
-  id: string;              // Unique identifier: format "ai-{timestamp}-{index}-{random}"
-  text: string;            // The tongue twister text (e.g., "Peter Piper picked a peck of pickled peppers")
-  difficulty: 1 | 2 | 3;   // 1=short, 2=medium, 3=long
-  topic: TwisterTopic;     // Topic this twister belongs to
-  length?: TwisterLength;  // Original length setting used
+  id: string; // Unique identifier: format "ai-{timestamp}-{index}-{random}"
+  text: string; // The tongue twister text (e.g., "Peter Piper picked a peck of pickled peppers")
+  difficulty: 1 | 2 | 3; // 1=short, 2=medium, 3=long
+  topic: TwisterTopic; // Topic this twister belongs to
+  length?: TwisterLength; // Original length setting used
 }
 ```
 
@@ -154,12 +158,12 @@ Player state data.
 
 ```typescript
 interface Player {
-  id: string;              // Socket-derived ID, format "host-{timestamp}-{random}" or "player-{timestamp}-{random}"
-  name: string;            // Player's display name
-  isHost: boolean;         // True if this player created the room
-  isReady: boolean;        // Player ready status (relevant in lobby)
-  currentScore: number;    // Current round's similarity score (0-100)
-  isConnected: boolean;    // Connection status
+  id: string; // Socket-derived ID, format "host-{timestamp}-{random}" or "player-{timestamp}-{random}"
+  name: string; // Player's display name
+  isHost: boolean; // True if this player created the room
+  isReady: boolean; // Player ready status (relevant in lobby)
+  currentScore: number; // Current round's similarity score (0-100)
+  isConnected: boolean; // Connection status
 }
 ```
 
@@ -171,10 +175,10 @@ Individual submission result for a round.
 
 ```typescript
 interface RoundResult {
-  playerId: string;        // ID of the submitting player
-  twisterId: string;        // ID of the twister attempted
-  similarity: number;       // Score from 0-100
-  completedAt: number;     // Unix timestamp (ms) when submitted
+  playerId: string; // ID of the submitting player
+  twisterId: string; // ID of the twister attempted
+  similarity: number; // Score from 0-100
+  completedAt: number; // Unix timestamp (ms) when submitted
 }
 ```
 
@@ -184,28 +188,28 @@ Complete game state maintained by server.
 
 ```typescript
 interface GameState {
-  roomCode: string;                    // 4-character room code (e.g., "ABCD")
-  settings: GameSettings;              // Game configuration
-  players: Player[];                    // All players in the room
-  twisters: Twister[];                  // Generated twisters (populated when game starts)
-  currentRound: number;                 // Current round index (0-indexed), -1 before start
-  roundResults: RoundResult[];         // All submission results for current game
-  status: GameScreen;                   // 'lobby' | 'playing' | 'paused' | 'game-over'
-  startedAt: number | null;            // Unix timestamp when game started, null if not started
-  pausedAt: number | null;             // Unix timestamp when paused, null if not paused
-  totalPausedTime: number;             // Cumulative paused duration in ms
+  roomCode: string; // 4-character room code (e.g., "ABCD")
+  settings: GameSettings; // Game configuration
+  players: Player[]; // All players in the room
+  twisters: Twister[]; // Generated twisters (populated when game starts)
+  currentRound: number; // Current round index (0-indexed), -1 before start
+  roundResults: RoundResult[]; // All submission results for current game
+  status: GameScreen; // 'lobby' | 'playing' | 'paused' | 'game-over'
+  startedAt: number | null; // Unix timestamp when game started, null if not started
+  pausedAt: number | null; // Unix timestamp when paused, null if not paused
+  totalPausedTime: number; // Cumulative paused duration in ms
   currentTwisterStartTime: number | null; // Unix timestamp when current twister started
 }
 ```
 
 ### GameScreen Values
 
-| Value | Description |
-|-------|-------------|
-| `lobby` | Waiting for players, host can start game |
-| `playing` | Game in progress, accepting submissions |
-| `paused` | Game paused, no submissions accepted |
-| `game-over` | All rounds completed, showing results |
+| Value       | Description                              |
+| ----------- | ---------------------------------------- |
+| `lobby`     | Waiting for players, host can start game |
+| `playing`   | Game in progress, accepting submissions  |
+| `paused`    | Game paused, no submissions accepted     |
+| `game-over` | All rounds completed, showing results    |
 
 ---
 
@@ -220,47 +224,55 @@ All events return a response via callback (acknowledgement pattern).
 Creates a new game room and becomes the host.
 
 **Payload:**
+
 ```typescript
 interface CreateRoomPayload {
-  playerName: string;   // Host's display name
+  playerName: string; // Host's display name
   settings: GameSettings; // Game configuration
 }
 ```
 
 **Success Response:**
+
 ```typescript
 {
   success: true;
-  roomCode: string;     // 4-character room code
-  player: Player;        // The host's player object (SAVE THIS)
-  game: GameState;       // Initial game state
+  roomCode: string; // 4-character room code
+  player: Player; // The host's player object (SAVE THIS)
+  game: GameState; // Initial game state
 }
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
-  error: string;         // Error message
+  error: string; // Error message
 }
 ```
 
 **Example:**
+
 ```typescript
-socket.emit('create-room', {
-  playerName: 'Alice',
-  settings: {
-    topic: 'animals',
-    length: 'medium',
-    rounds: 5
+socket.emit(
+  'create-room',
+  {
+    playerName: 'Alice',
+    settings: {
+      topic: 'animals',
+      length: 'medium',
+      rounds: 5,
+    },
+  },
+  (response) => {
+    if (response.success) {
+      const { roomCode, player, game } = response;
+      console.log(`Room created: ${roomCode}`);
+      // Store player.id for later use
+    }
   }
-}, (response) => {
-  if (response.success) {
-    const { roomCode, player, game } = response;
-    console.log(`Room created: ${roomCode}`);
-    // Store player.id for later use
-  }
-});
+);
 ```
 
 ---
@@ -270,24 +282,27 @@ socket.emit('create-room', {
 Joins an existing room.
 
 **Payload:**
+
 ```typescript
 interface JoinRoomPayload {
-  roomCode: string;    // 4-character room code (case-insensitive)
-  playerName: string;   // Player's display name
+  roomCode: string; // 4-character room code (case-insensitive)
+  playerName: string; // Player's display name
 }
 ```
 
 **Success Response:**
+
 ```typescript
 {
   success: true;
   roomCode: string;
-  player: Player;       // The joining player's object (SAVE THIS)
-  game: GameState;      // Current game state
+  player: Player; // The joining player's object (SAVE THIS)
+  game: GameState; // Current game state
 }
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
@@ -296,15 +311,20 @@ interface JoinRoomPayload {
 ```
 
 **Example:**
+
 ```typescript
-socket.emit('join-room', {
-  roomCode: 'ABCD',
-  playerName: 'Bob'
-}, (response) => {
-  if (response.success) {
-    const { roomCode, player, game } = response;
+socket.emit(
+  'join-room',
+  {
+    roomCode: 'ABCD',
+    playerName: 'Bob',
+  },
+  (response) => {
+    if (response.success) {
+      const { roomCode, player, game } = response;
+    }
   }
-});
+);
 ```
 
 ---
@@ -316,6 +336,7 @@ Starts the game (host only).
 **Payload:** None (empty object or omit)
 
 **Success Response:**
+
 ```typescript
 {
   success: true;
@@ -323,6 +344,7 @@ Starts the game (host only).
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
@@ -331,11 +353,13 @@ Starts the game (host only).
 ```
 
 **Side Effects on Success:**
-- Server generates twisters via OpenAI
+
+- Server generates twisters via API endpoint (/api/generate)
 - Emits `game-started` event to all players
 - Starts round timer (30 seconds)
 
 **Example:**
+
 ```typescript
 socket.emit('start-game', {}, (response) => {
   if (response.success) {
@@ -351,22 +375,25 @@ socket.emit('start-game', {}, (response) => {
 Submits a player's spoken transcript for scoring.
 
 **Payload:**
+
 ```typescript
 interface SubmitAnswerPayload {
-  transcript: string;    // The spoken text (from Speech-to-Text)
-  timestamp: number;      // Client timestamp (ms) for latency validation
+  transcript: string; // The spoken text (from Speech-to-Text)
+  timestamp: number; // Client timestamp (ms) for latency validation
 }
 ```
 
 **Success Response:**
+
 ```typescript
 {
   success: true;
-  similarity: number;    // Score from 0-100
+  similarity: number; // Score from 0-100
 }
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
@@ -375,6 +402,7 @@ interface SubmitAnswerPayload {
 ```
 
 **Validation Rules:**
+
 - Game status must be `playing`
 - Game must not be paused
 - Round timer must not have expired (within 30 seconds)
@@ -384,15 +412,20 @@ interface SubmitAnswerPayload {
 If all players submit, server waits 2 seconds then emits `round-advanced`.
 
 **Example:**
+
 ```typescript
-socket.emit('submit-answer', {
-  transcript: 'Peter piper picked a peck of pickled peppers',
-  timestamp: Date.now()
-}, (response) => {
-  if (response.success) {
-    console.log(`Score: ${response.similarity}`);
+socket.emit(
+  'submit-answer',
+  {
+    transcript: 'Peter piper picked a peck of pickled peppers',
+    timestamp: Date.now(),
+  },
+  (response) => {
+    if (response.success) {
+      console.log(`Score: ${response.similarity}`);
+    }
   }
-});
+);
 ```
 
 ---
@@ -404,6 +437,7 @@ Pauses the game (any player can pause).
 **Payload:** None
 
 **Success Response:**
+
 ```typescript
 {
   success: true;
@@ -411,6 +445,7 @@ Pauses the game (any player can pause).
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
@@ -419,11 +454,13 @@ Pauses the game (any player can pause).
 ```
 
 **Side Effects on Success:**
+
 - Emits `game-paused` event to all players
 - Pauses round timer
 - Sets `game.pausedAt` timestamp
 
 **Example:**
+
 ```typescript
 socket.emit('pause-game', {}, (response) => {
   if (response.success) {
@@ -441,6 +478,7 @@ Resumes a paused game.
 **Payload:** None
 
 **Success Response:**
+
 ```typescript
 {
   success: true;
@@ -448,6 +486,7 @@ Resumes a paused game.
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
@@ -456,11 +495,13 @@ Resumes a paused game.
 ```
 
 **Side Effects on Success:**
+
 - Emits `game-resumed` event to all players
 - Resumes round timer (adjusting for pause duration)
 - Updates `game.totalPausedTime`
 
 **Example:**
+
 ```typescript
 socket.emit('resume-game', {}, (response) => {
   if (response.success) {
@@ -478,15 +519,17 @@ Retrieves current game state (for reconnection/sync).
 **Payload:** None
 
 **Success Response:**
+
 ```typescript
 {
   success: true;
   game: GameState;
-  playerId: string;     // The client's player ID
+  playerId: string; // The client's player ID
 }
 ```
 
 **Error Response:**
+
 ```typescript
 {
   success: false;
@@ -495,6 +538,7 @@ Retrieves current game state (for reconnection/sync).
 ```
 
 **Example:**
+
 ```typescript
 socket.emit('get-room-state', {}, (response) => {
   if (response.success) {
@@ -513,19 +557,22 @@ socket.emit('get-room-state', {}, (response) => {
 Broadcast when a new player joins the room.
 
 **Payload:**
+
 ```typescript
 interface PlayerJoinedEvent {
-  player: Player;        // The player who joined
-  players: Player[];      // Updated player list
-  game: GameState;        // Updated game state
+  player: Player; // The player who joined
+  players: Player[]; // Updated player list
+  game: GameState; // Updated game state
 }
 ```
 
 **When Received:**
+
 - Other players receive when someone joins
 - Joiner does NOT receive this (they get callback from `join-room`)
 
 **Example Handler:**
+
 ```typescript
 socket.on('player-joined', ({ player, players, game }) => {
   console.log(`${player.name} joined the room`);
@@ -541,18 +588,21 @@ socket.on('player-joined', ({ player, players, game }) => {
 Broadcast when game begins.
 
 **Payload:**
+
 ```typescript
 interface GameStartedEvent {
-  game: GameState;              // Full updated game state
-  currentTwister: Twister;     // First twister to display
-  roundStartTime: number;       // Unix timestamp (ms) for countdown
+  game: GameState; // Full updated game state
+  currentTwister: Twister; // First twister to display
+  roundStartTime: number; // Unix timestamp (ms) for countdown
 }
 ```
 
 **When Received:**
+
 - All players receive when host starts game
 
 **Example Handler:**
+
 ```typescript
 socket.on('game-started', ({ game, currentTwister, roundStartTime }) => {
   updateGameState(game);
@@ -568,20 +618,23 @@ socket.on('game-started', ({ game, currentTwister, roundStartTime }) => {
 Broadcast when any player submits an answer.
 
 **Payload:**
+
 ```typescript
 interface PlayerSubmittedEvent {
-  playerId: string;     // ID of submitting player
-  similarity: number;   // Their similarity score
+  playerId: string; // ID of submitting player
+  similarity: number; // Their similarity score
 }
 ```
 
 **When Received:**
+
 - All players receive when any player submits
 
 **Example Handler:**
+
 ```typescript
 socket.on('player-submitted', ({ playerId, similarity }) => {
-  const player = gameState.players.find(p => p.id === playerId);
+  const player = gameState.players.find((p) => p.id === playerId);
   showSubmissionIndicator(player.name, similarity);
 });
 ```
@@ -593,18 +646,21 @@ socket.on('player-submitted', ({ playerId, similarity }) => {
 Broadcast when moving to next round.
 
 **Payload:**
+
 ```typescript
 interface RoundAdvancedEvent {
-  currentRound: number;      // New round index (0-indexed)
-  currentTwister: Twister;   // Next twister to display
-  roundStartTime: number;    // Unix timestamp (ms) for countdown
+  currentRound: number; // New round index (0-indexed)
+  currentTwister: Twister; // Next twister to display
+  roundStartTime: number; // Unix timestamp (ms) for countdown
 }
 ```
 
 **When Received:**
+
 - All players receive when advancing (auto or timeout)
 
 **Example Handler:**
+
 ```typescript
 socket.on('round-advanced', ({ currentRound, currentTwister, roundStartTime }) => {
   gameState.currentRound = currentRound;
@@ -620,14 +676,16 @@ socket.on('round-advanced', ({ currentRound, currentTwister, roundStartTime }) =
 Broadcast when game is paused.
 
 **Payload:**
+
 ```typescript
 interface GamePausedEvent {
-  pausedAt: number;    // Unix timestamp when paused
-  pausedBy: string;    // Player ID who paused
+  pausedAt: number; // Unix timestamp when paused
+  pausedBy: string; // Player ID who paused
 }
 ```
 
 **Example Handler:**
+
 ```typescript
 socket.on('game-paused', ({ pausedAt, pausedBy }) => {
   gameState.status = 'paused';
@@ -643,14 +701,16 @@ socket.on('game-paused', ({ pausedAt, pausedBy }) => {
 Broadcast when game resumes from pause.
 
 **Payload:**
+
 ```typescript
 interface GameResumedEvent {
-  resumedAt: number;           // Unix timestamp when resumed
-  totalPausedTime: number;     // Cumulative paused time in ms
+  resumedAt: number; // Unix timestamp when resumed
+  totalPausedTime: number; // Cumulative paused time in ms
 }
 ```
 
 **Example Handler:**
+
 ```typescript
 socket.on('game-resumed', ({ resumedAt, totalPausedTime }) => {
   gameState.status = 'playing';
@@ -667,12 +727,13 @@ socket.on('game-resumed', ({ resumedAt, totalPausedTime }) => {
 Broadcast when all rounds complete.
 
 **Payload:**
+
 ```typescript
 interface GameEndedEvent {
   leaderboard: Array<{
     player: Player;
-    accuracy: number;    // Average similarity score (0-100)
-    time: number;       // Total game time in ms (excluding pauses)
+    accuracy: number; // Average similarity score (0-100)
+    time: number; // Total game time in ms (excluding pauses)
   }>;
 }
 ```
@@ -680,6 +741,7 @@ interface GameEndedEvent {
 **Sorting:** Descending by accuracy, then ascending by time.
 
 **Example Handler:**
+
 ```typescript
 socket.on('game-ended', ({ leaderboard }) => {
   gameState.status = 'game-over';
@@ -694,22 +756,25 @@ socket.on('game-ended', ({ leaderboard }) => {
 Broadcast when a player disconnects.
 
 **Payload:**
+
 ```typescript
 interface PlayerLeftEvent {
-  playerId: string;    // ID of disconnected player
-  players: Player[];   // Updated player list
+  playerId: string; // ID of disconnected player
+  players: Player[]; // Updated player list
 }
 ```
 
 **When Received:**
+
 - All remaining players receive
 
 **Host Reassignment:** If host disconnects, the first remaining player becomes the new host.
 
 **Example Handler:**
+
 ```typescript
 socket.on('player-left', ({ playerId, players }) => {
-  const leftPlayer = gameState.players.find(p => p.id === playerId);
+  const leftPlayer = gameState.players.find((p) => p.id === playerId);
   showNotification(`${leftPlayer?.name || 'Player'} left the room`);
   updatePlayersList(players);
 });
@@ -793,6 +858,7 @@ socket.on('player-left', ({ playerId, players }) => {
 ### Lobby Phase Detailed Flow
 
 1. **Host Creates Room**
+
    ```
    Client: emit('create-room', { playerName, settings })
    Server: Creates room, generates 4-char code
@@ -801,6 +867,7 @@ socket.on('player-left', ({ playerId, players }) => {
    ```
 
 2. **Players Join Room**
+
    ```
    Client: emit('join-room', { roomCode, playerName })
    Server: Validates room exists, not full, lobby status
@@ -813,7 +880,7 @@ socket.on('player-left', ({ playerId, players }) => {
    ```
    Host: emit('start-game')
    Server: Validates host permission
-   Server: Calls generateTwisters() via OpenAI
+    Server: Calls generateTwisters() via API endpoint (/api/generate)
    Server: Updates game state (currentRound=0, status='playing')
    Server: Broadcasts 'game-started' to all players
    Server: Starts 30s round timer
@@ -822,6 +889,7 @@ socket.on('player-left', ({ playerId, players }) => {
 ### Playing Phase Detailed Flow
 
 1. **Round Start**
+
    ```
    All Clients: Receive 'game-started' or 'round-advanced'
    All Clients: Display currentTwister.text
@@ -829,6 +897,7 @@ socket.on('player-left', ({ playerId, players }) => {
    ```
 
 2. **Player Submits Answer**
+
    ```
    Client: emit('submit-answer', { transcript, timestamp })
    Server: Validates game status, timing
@@ -882,6 +951,7 @@ socket.on('player-left', ({ playerId, players }) => {
 ### Disconnection Handling
 
 1. **Player Disconnects Mid-Lobby**
+
    ```
    Server: Removes player from players array
    Server: Broadcasts 'player-left' to remaining
@@ -890,6 +960,7 @@ socket.on('player-left', ({ playerId, players }) => {
    ```
 
 2. **Player Disconnects Mid-Game**
+
    ```
    Server: Marks player as disconnected (isConnected: false)
    Server: Removes from active players
@@ -939,43 +1010,44 @@ function createGameStore() {
 
   return {
     subscribe,
-    
-    setSocket: (socket: Socket) => update(s => ({ ...s, socket })),
-    
-    setPlayer: (player: Player) => update(s => ({ ...s, player })),
-    
-    setRoomCode: (roomCode: string) => update(s => ({ ...s, roomCode })),
-    
-    setGame: (game: GameState) => update(s => ({ ...s, game })),
-    
-    updateGame: (updater: (game: GameState) => GameState) => 
-      update(s => ({ ...s, game: s.game ? updater(s.game) : null })),
-    
-    setConnected: (isConnected: boolean) => update(s => ({ ...s, isConnected })),
-    
-    setError: (error: string | null) => update(s => ({ ...s, error })),
-    
-    reset: () => set({
-      socket: null,
-      player: null,
-      roomCode: null,
-      game: null,
-      isConnected: false,
-      error: null,
-    }),
+
+    setSocket: (socket: Socket) => update((s) => ({ ...s, socket })),
+
+    setPlayer: (player: Player) => update((s) => ({ ...s, player })),
+
+    setRoomCode: (roomCode: string) => update((s) => ({ ...s, roomCode })),
+
+    setGame: (game: GameState) => update((s) => ({ ...s, game })),
+
+    updateGame: (updater: (game: GameState) => GameState) =>
+      update((s) => ({ ...s, game: s.game ? updater(s.game) : null })),
+
+    setConnected: (isConnected: boolean) => update((s) => ({ ...s, isConnected })),
+
+    setError: (error: string | null) => update((s) => ({ ...s, error })),
+
+    reset: () =>
+      set({
+        socket: null,
+        player: null,
+        roomCode: null,
+        game: null,
+        isConnected: false,
+        error: null,
+      }),
   };
 }
 
 export const gameStore = createGameStore();
 
 // Derived stores for convenience
-export const players = derived(gameStore, $game => $game.game?.players ?? []);
-export const currentTwister = derived(gameStore, $game => {
+export const players = derived(gameStore, ($game) => $game.game?.players ?? []);
+export const currentTwister = derived(gameStore, ($game) => {
   if (!$game.game || $game.game.currentRound < 0) return null;
   return $game.game.twisters[$game.game.currentRound] ?? null;
 });
-export const gameStatus = derived(gameStore, $game => $game.game?.status ?? 'lobby');
-export const isHost = derived(gameStore, $game => $game.player?.isHost ?? false);
+export const gameStatus = derived(gameStore, ($game) => $game.game?.status ?? 'lobby');
+export const isHost = derived(gameStore, ($game) => $game.player?.isHost ?? false);
 ```
 
 ### Socket Event Handler Setup
@@ -1011,52 +1083,50 @@ export function setupSocketHandlers(socket: Socket) {
   });
 
   socket.on('player-submitted', ({ playerId, similarity }) => {
-    gameStore.updateGame(g => ({
+    gameStore.updateGame((g) => ({
       ...g,
-      players: g.players.map(p => 
-        p.id === playerId ? { ...p, currentScore: similarity } : p
-      )
+      players: g.players.map((p) => (p.id === playerId ? { ...p, currentScore: similarity } : p)),
     }));
   });
 
   socket.on('round-advanced', ({ currentRound, currentTwister, roundStartTime }) => {
-    gameStore.updateGame(g => ({
+    gameStore.updateGame((g) => ({
       ...g,
       currentRound,
       // Reset scores for new round
-      players: g.players.map(p => ({ ...p, currentScore: 0 }))
+      players: g.players.map((p) => ({ ...p, currentScore: 0 })),
     }));
   });
 
   socket.on('game-paused', ({ pausedAt, pausedBy }) => {
-    gameStore.updateGame(g => ({
+    gameStore.updateGame((g) => ({
       ...g,
       status: 'paused',
-      pausedAt
+      pausedAt,
     }));
   });
 
   socket.on('game-resumed', ({ resumedAt, totalPausedTime }) => {
-    gameStore.updateGame(g => ({
+    gameStore.updateGame((g) => ({
       ...g,
       status: 'playing',
       pausedAt: null,
-      totalPausedTime
+      totalPausedTime,
     }));
   });
 
   socket.on('game-ended', ({ leaderboard }) => {
-    gameStore.updateGame(g => ({
+    gameStore.updateGame((g) => ({
       ...g,
-      status: 'game-over'
+      status: 'game-over',
     }));
     // leaderboard contains final rankings
   });
 
   socket.on('player-left', ({ playerId, players }) => {
-    gameStore.updateGame(g => ({
+    gameStore.updateGame((g) => ({
       ...g,
-      players
+      players,
     }));
   });
 }
@@ -1153,17 +1223,21 @@ export function submitAnswer(transcript: string): Promise<number | null> {
   if (!socket) return Promise.resolve(null);
 
   return new Promise((resolve) => {
-    socket.emit('submit-answer', {
-      transcript,
-      timestamp: Date.now()
-    }, (response: any) => {
-      if (response.success) {
-        resolve(response.similarity);
-      } else {
-        gameStore.setError(response.error);
-        resolve(null);
+    socket.emit(
+      'submit-answer',
+      {
+        transcript,
+        timestamp: Date.now(),
+      },
+      (response: any) => {
+        if (response.success) {
+          resolve(response.similarity);
+        } else {
+          gameStore.setError(response.error);
+          resolve(null);
+        }
       }
-    });
+    );
   });
 }
 ```
@@ -1205,31 +1279,35 @@ The server is the source of truth for timing. Clients should calculate remaining
 // src/lib/utils/countdown.ts
 const ROUND_DURATION = 30000; // 30 seconds
 
-export function createCountdown(roundStartTime: number, onTick: (remaining: number) => void, onExpire: () => void) {
+export function createCountdown(
+  roundStartTime: number,
+  onTick: (remaining: number) => void,
+  onExpire: () => void
+) {
   let intervalId: number | null = null;
-  
+
   const calculateRemaining = () => {
     const elapsed = Date.now() - roundStartTime;
     return Math.max(0, ROUND_DURATION - elapsed);
   };
-  
+
   const tick = () => {
     const remaining = calculateRemaining();
     onTick(remaining);
-    
+
     if (remaining <= 0) {
       if (intervalId) clearInterval(intervalId);
       onExpire();
     }
   };
-  
+
   intervalId = window.setInterval(tick, 100); // Update every 100ms
-  
+
   return {
     stop: () => {
       if (intervalId) clearInterval(intervalId);
     },
-    getRemaining: calculateRemaining
+    getRemaining: calculateRemaining,
   };
 }
 ```
@@ -1240,11 +1318,10 @@ export function createCountdown(roundStartTime: number, onTick: (remaining: numb
 
 ### Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PORT` | `3001` | Server port |
+| Variable     | Default                 | Description         |
+| ------------ | ----------------------- | ------------------- |
+| `PORT`       | `3001`                  | Server port         |
 | `CLIENT_URL` | `http://localhost:5173` | Allowed CORS origin |
-| `OPENAI_API_KEY` | (required) | OpenAI API key for twister generation |
 
 ### Running the Server
 
@@ -1270,7 +1347,6 @@ npm start
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "openai": "^6.22.0",
     "socket.io": "^4.7.0"
   },
   "devDependencies": {
@@ -1302,25 +1378,25 @@ socket.emit('some-event', payload, (response: ApiResponse) => {
 
 ### Server-Side Error Messages
 
-| Event | Error Message | Cause |
-|-------|--------------|-------|
-| `join-room` | `Room not found or full` | Room doesn't exist OR already has 4 players |
-| `join-room` | `Game already in progress` | Room status is not 'lobby' |
-| `start-game` | `Not in a room` | Client not joined to any room |
-| `start-game` | `Only host can start game` | Player is not the host |
-| `submit-answer` | `Not in a room` | Client not joined to any room |
-| `submit-answer` | `Cannot submit answer` | Game not in 'playing' state, paused, or timer expired |
-| `pause-game` | `Not in a room` | Client not joined to any room |
-| `resume-game` | `Not in a room` | Client not joined to any room |
-| `get-room-state` | `Not in a room` | Client not joined to any room |
-| `get-room-state` | `Room not found` | Room was deleted |
+| Event            | Error Message              | Cause                                                 |
+| ---------------- | -------------------------- | ----------------------------------------------------- |
+| `join-room`      | `Room not found or full`   | Room doesn't exist OR already has 4 players           |
+| `join-room`      | `Game already in progress` | Room status is not 'lobby'                            |
+| `start-game`     | `Not in a room`            | Client not joined to any room                         |
+| `start-game`     | `Only host can start game` | Player is not the host                                |
+| `submit-answer`  | `Not in a room`            | Client not joined to any room                         |
+| `submit-answer`  | `Cannot submit answer`     | Game not in 'playing' state, paused, or timer expired |
+| `pause-game`     | `Not in a room`            | Client not joined to any room                         |
+| `resume-game`    | `Not in a room`            | Client not joined to any room                         |
+| `get-room-state` | `Not in a room`            | Client not joined to any room                         |
+| `get-room-state` | `Room not found`           | Room was deleted                                      |
 
 ### Connection Error Recovery
 
 ```typescript
 socket.on('connect_error', (error) => {
   console.error('Connection error:', error);
-  
+
   // Attempt reconnection with backoff
   setTimeout(() => {
     socket.connect();
@@ -1329,7 +1405,7 @@ socket.on('connect_error', (error) => {
 
 socket.on('disconnect', (reason) => {
   console.log('Disconnected:', reason);
-  
+
   // Handle intentional disconnects
   if (reason === 'io server disconnect') {
     // Server disconnected us, manually reconnect
@@ -1354,11 +1430,12 @@ The server uses Levenshtein distance for similarity scoring.
 ### Similarity Calculation
 
 ```
-similarity = ((max(len(target), len(input)) - levenshteinDistance(target, input)) 
+similarity = ((max(len(target), len(input)) - levenshteinDistance(target, input))
               / max(len(target), len(input))) * 100
 ```
 
 **Example:**
+
 - Target: "Peter Piper picked a peck of pickled peppers"
 - Input: "Peter piper picked a peck of pickled peppers"
 - Distance: 1 (case difference in "Piper")
@@ -1367,11 +1444,11 @@ similarity = ((max(len(target), len(input)) - levenshteinDistance(target, input)
 ### Score Interpretation
 
 | Score Range | Interpretation |
-|-------------|----------------|
-| 90-100 | Near perfect |
-| 70-89 | Good attempt |
-| 50-69 | Partial match |
-| 0-49 | Poor match |
+| ----------- | -------------- |
+| 90-100      | Near perfect   |
+| 70-89       | Good attempt   |
+| 50-69       | Partial match  |
+| 0-49        | Poor match     |
 
 ---
 
@@ -1389,8 +1466,8 @@ The server is the **single source of truth** for all timing:
 ### Round Timer Constants
 
 ```typescript
-const ROUND_TIME_LIMIT = 30000;      // 30 seconds per twister
-const AUTO_ADVANCE_DELAY = 2000;     // 2 seconds after all submit
+const ROUND_TIME_LIMIT = 30000; // 30 seconds per twister
+const AUTO_ADVANCE_DELAY = 2000; // 2 seconds after all submit
 ```
 
 ### Latency Compensation
@@ -1427,23 +1504,23 @@ const totalTime = Date.now() - room.game.startedAt - room.game.totalPausedTime;
 
 ### Socket Events Quick Reference
 
-| Direction | Event | Payload | Response |
-|-----------|-------|---------|----------|
-| C → S | `create-room` | `{ playerName, settings }` | `{ success, roomCode, player, game }` |
-| C → S | `join-room` | `{ roomCode, playerName }` | `{ success, roomCode, player, game }` |
-| C → S | `start-game` | `{}` | `{ success }` |
-| C → S | `submit-answer` | `{ transcript, timestamp }` | `{ success, similarity }` |
-| C → S | `pause-game` | `{}` | `{ success }` |
-| C → S | `resume-game` | `{}` | `{ success }` |
-| C → S | `get-room-state` | `{}` | `{ success, game, playerId }` |
-| S → C | `player-joined` | `{ player, players, game }` | - |
-| S → C | `game-started` | `{ game, currentTwister, roundStartTime }` | - |
-| S → C | `player-submitted` | `{ playerId, similarity }` | - |
-| S → C | `round-advanced` | `{ currentRound, currentTwister, roundStartTime }` | - |
-| S → C | `game-paused` | `{ pausedAt, pausedBy }` | - |
-| S → C | `game-resumed` | `{ resumedAt, totalPausedTime }` | - |
-| S → C | `game-ended` | `{ leaderboard }` | - |
-| S → C | `player-left` | `{ playerId, players }` | - |
+| Direction | Event              | Payload                                            | Response                              |
+| --------- | ------------------ | -------------------------------------------------- | ------------------------------------- |
+| C → S     | `create-room`      | `{ playerName, settings }`                         | `{ success, roomCode, player, game }` |
+| C → S     | `join-room`        | `{ roomCode, playerName }`                         | `{ success, roomCode, player, game }` |
+| C → S     | `start-game`       | `{}`                                               | `{ success }`                         |
+| C → S     | `submit-answer`    | `{ transcript, timestamp }`                        | `{ success, similarity }`             |
+| C → S     | `pause-game`       | `{}`                                               | `{ success }`                         |
+| C → S     | `resume-game`      | `{}`                                               | `{ success }`                         |
+| C → S     | `get-room-state`   | `{}`                                               | `{ success, game, playerId }`         |
+| S → C     | `player-joined`    | `{ player, players, game }`                        | -                                     |
+| S → C     | `game-started`     | `{ game, currentTwister, roundStartTime }`         | -                                     |
+| S → C     | `player-submitted` | `{ playerId, similarity }`                         | -                                     |
+| S → C     | `round-advanced`   | `{ currentRound, currentTwister, roundStartTime }` | -                                     |
+| S → C     | `game-paused`      | `{ pausedAt, pausedBy }`                           | -                                     |
+| S → C     | `game-resumed`     | `{ resumedAt, totalPausedTime }`                   | -                                     |
+| S → C     | `game-ended`       | `{ leaderboard }`                                  | -                                     |
+| S → C     | `player-left`      | `{ playerId, players }`                            | -                                     |
 
 ---
 
