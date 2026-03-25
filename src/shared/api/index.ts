@@ -1,1 +1,1 @@
-export { callOpenAI, isApiKeyConfigured } from './openai';
+export { generateTwisters } from './twister-api';

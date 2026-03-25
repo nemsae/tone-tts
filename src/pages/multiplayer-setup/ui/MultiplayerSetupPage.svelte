@@ -2,7 +2,7 @@
   import { push } from 'svelte-spa-router';
   import { onMount, onDestroy } from 'svelte';
   import { socketService, multiplayerGameStore } from '@/shared/lib';
-  import { gameSettingsStore, type GameSettings } from '@/entities/session';
+  import { gameSettingsStore, type GameSettings, validateTopic } from '@/entities/session';
   import type { GameSettings as MultiplayerGameSettings } from '@/shared/lib/multiplayer-types';
   import { GameSettingsForm } from '@/widgets/game-settings-form';
   import { Button, Input } from '@/shared/ui';
@@ -40,10 +40,20 @@
       return;
     }
 
-    const topic = gameSettingsStore.selectedTopic;
+    const useCustomTopic = gameSettingsStore.useCustomTopic;
+    const topic = useCustomTopic ? gameSettingsStore.customTopic : gameSettingsStore.selectedTopic;
     if (!topic) {
       error = 'Please select or enter a topic';
       return;
+    }
+
+    // Validate custom topic
+    if (useCustomTopic) {
+      const validationError = validateTopic(topic);
+      if (validationError) {
+        error = validationError;
+        return;
+      }
     }
 
     error = '';

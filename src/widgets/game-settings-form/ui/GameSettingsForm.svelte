@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameSettingsStore, PREDEFINED_TOPICS } from '@/entities/session';
+  import { gameSettingsStore, PREDEFINED_TOPICS, TOPIC_MAX_LENGTH } from '@/entities/session';
   import type { TwisterLength } from '@/shared/vendor';
   import { Button, Input, RangeSlider } from '@/shared/ui';
   import styles from './game-settings-form.module.scss';
@@ -90,6 +90,7 @@
           <Input
             placeholder="or type custom theme..."
             value={$gameSettingsStore.customTopic}
+            maxlength={TOPIC_MAX_LENGTH}
             oninput={(e) => gameSettingsStore.setCustomTopic((e.target as HTMLInputElement).value)}
           />
         </div>
