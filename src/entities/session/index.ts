@@ -19,6 +19,10 @@ export {
   loadFinalResult,
   clearFinalResult,
   scoreTwister,
+  sanitizeTopic,
+  validateTopic,
+  TOPIC_MIN_LENGTH,
+  TOPIC_MAX_LENGTH,
 } from './model';
 
 export type GameScreen = 'home' | 'play' | 'game-over';

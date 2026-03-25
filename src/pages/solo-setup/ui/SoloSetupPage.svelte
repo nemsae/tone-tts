@@ -1,7 +1,7 @@
 <script lang="ts">
   import { push } from 'svelte-spa-router';
   import { generateAITwisters } from '@/features/twister-generator';
-  import { createSession, saveSession, gameSettingsStore, type GameSettings } from '@/entities/session';
+  import { createSession, saveSession, gameSettingsStore, type GameSettings, validateTopic } from '@/entities/session';
   import { GameSettingsForm } from '@/widgets/game-settings-form';
   import styles from './solo-setup.module.scss';
 
@@ -9,20 +9,24 @@
   let error = $state('');
 
   async function handleStartGame() {
-    const topic = gameSettingsStore.selectedTopic;
+    const useCustomTopic = gameSettingsStore.useCustomTopic;
+    const topic = useCustomTopic ? gameSettingsStore.customTopic : gameSettingsStore.selectedTopic;
     const length = gameSettingsStore.length;
     const customLength = gameSettingsStore.customLength;
     const rounds = gameSettingsStore.rounds;
-    const useCustomTopic = gameSettingsStore.useCustomTopic;
 
     if (!topic) {
       error = 'Please select or enter a topic';
       return;
     }
 
-    if (useCustomTopic && topic.length < 2) {
-      error = 'Custom topic must be at least 2 characters';
-      return;
+    // Validate custom topic
+    if (useCustomTopic) {
+      const validationError = validateTopic(topic);
+      if (validationError) {
+        error = validationError;
+        return;
+      }
     }
 
     if (length === 'custom' && (customLength < 5 || customLength > 40)) {
