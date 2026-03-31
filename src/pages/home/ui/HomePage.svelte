@@ -1,6 +1,13 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { push } from 'svelte-spa-router';
+  import { getActiveLobbyPlayerCount } from '@/shared/api';
   import styles from './home.module.scss';
+
+  const LOBBY_COUNT_REFRESH_INTERVAL_MS = 30_000;
+  const numberFormatter = new Intl.NumberFormat('en-US');
+
+  let activeLobbyPlayerCount = $state(0);
 
   function handleSolo() {
     push('/solo-setup');
@@ -17,6 +24,27 @@
   function handleJoinRoom() {
     push('/multiplayer-join');
   }
+
+  async function loadActiveLobbyPlayerCount() {
+    try {
+      activeLobbyPlayerCount = await getActiveLobbyPlayerCount();
+    } catch (error) {
+      console.error('Failed to load active lobby player count:', error);
+      activeLobbyPlayerCount = 0;
+    }
+  }
+
+  onMount(() => {
+    void loadActiveLobbyPlayerCount();
+
+    const refreshTimer = window.setInterval(() => {
+      void loadActiveLobbyPlayerCount();
+    }, LOBBY_COUNT_REFRESH_INTERVAL_MS);
+
+    return () => {
+      window.clearInterval(refreshTimer);
+    };
+  });
 
   // const activeRooms = [
   //   { name: "jazz & swing session", players: "3/4", level: "level 12", type: 'public' },
@@ -90,7 +118,9 @@
             <span class={styles.avatar}>MK</span>
             <span class={styles.avatar}>AL</span>
           </span>
-          <span class={styles.playerCount}>1,240 players active in the lobby right now.</span>
+          <span class={styles.playerCount}>
+            {numberFormatter.format(activeLobbyPlayerCount)} players active in the lobby right now.
+          </span>
         </div>
       </div>
     </div>
