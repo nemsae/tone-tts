@@ -1,18 +1,16 @@
 import type { Twister, TwisterLength } from '@/shared/vendor';
+import type {
+  ClientCreateRoomDto,
+  ClientJoinRoomDto,
+  ClientMultiplayerGameSettings,
+} from './validation';
+import type { SubmitAnswerDto } from '@jaysonder/tts-validation';
 
 export type { Twister, TwisterLength };
 
 export type GameScreen = 'lobby' | 'playing' | 'paused' | 'game-over';
 
-export interface GameSettings {
-  topic: string;
-  length: TwisterLength;
-  customLength?: number;
-  rounds: number;
-  roundTimeLimit?: number | null;
-  autoSubmitEnabled?: boolean;
-  autoSubmitDelay?: number;
-}
+export type GameSettings = ClientMultiplayerGameSettings;
 
 export interface Player {
   id: string;
@@ -50,20 +48,11 @@ export interface LeaderboardEntry {
   time: number;
 }
 
-export interface CreateRoomPayload {
-  playerName: string;
-  settings: GameSettings;
-}
+export type CreateRoomPayload = ClientCreateRoomDto;
 
-export interface JoinRoomPayload {
-  roomCode: string;
-  playerName: string;
-}
+export type JoinRoomPayload = ClientJoinRoomDto;
 
-export interface SubmitAnswerPayload {
-  transcript: string;
-  timestamp: number;
-}
+export type SubmitAnswerPayload = SubmitAnswerDto;
 
 export interface ApiResponse<T = void> {
   success: boolean;

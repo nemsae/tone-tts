@@ -1,8 +1,9 @@
 <script lang="ts">
   import { push } from 'svelte-spa-router';
   import { generateAITwisters } from '@/features/twister-generator';
-  import { createSession, saveSession, gameSettingsStore, validateTopic } from '@/entities/session';
+  import { createSession, saveSession, gameSettingsStore } from '@/entities/session';
   import type { GameSettings } from '@/entities/session';
+  import { parseGenerateTwistersPayload } from '@/shared/lib';
   import { get } from 'svelte/store';
   import { GameSettingsForm } from '@/widgets/game-settings-form';
   import styles from './solo-setup.module.scss';
@@ -18,22 +19,16 @@
     const customLength = storeState.customLength;
     const rounds = storeState.rounds;
 
-    if (!topic) {
-      error = 'Please select or enter a topic';
-      return;
-    }
-
-    // Validate custom topic
-    if (useCustomTopic) {
-      const validationError = validateTopic(topic);
-      if (validationError) {
-        error = validationError;
-        return;
-      }
-    }
-
-    if (length === 'custom' && (customLength < 5 || customLength > 40)) {
-      error = 'Custom difficulty must be between 5 and 40 words';
+    let payload;
+    try {
+      payload = parseGenerateTwistersPayload({
+        topic,
+        length,
+        customLength: length === 'custom' ? customLength : undefined,
+        rounds,
+      });
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Invalid game settings';
       return;
     }
 
@@ -42,16 +37,16 @@
 
     try {
       const twisters = await generateAITwisters(
-        topic,
-        length,
-        length === 'custom' ? customLength : undefined,
-        rounds
+        payload.topic,
+        payload.length,
+        payload.customLength,
+        payload.rounds ?? rounds
       );
       const settings: GameSettings = {
-        topic,
-        length,
-        customLength: length === 'custom' ? customLength : undefined,
-        rounds,
+        topic: payload.topic,
+        length: payload.length,
+        customLength: payload.customLength,
+        rounds: payload.rounds ?? rounds,
         autoSubmitEnabled: storeState.autoSubmitEnabled,
         autoSubmitDelay: storeState.autoSubmitDelay,
       };

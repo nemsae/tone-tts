@@ -1,7 +1,7 @@
 <script lang="ts">
   import { push } from 'svelte-spa-router';
   import { onMount, onDestroy } from 'svelte';
-  import { socketService, multiplayerGameStore } from '@/shared/lib';
+  import { parseSubmitAnswerPayload, socketService, multiplayerGameStore } from '@/shared/lib';
   import { speechStore, Modal } from '@/shared/ui';
   import type { Twister, Player, LeaderboardEntry } from '@/shared/lib/multiplayer-types';
   import styles from './multiplayer-game.module.scss';
@@ -188,10 +188,18 @@
   function handleSubmit() {
     if (!speechState.transcript || hasSubmitted) return;
 
-    socket.emit('submit-answer', {
-      transcript: speechState.transcript,
-      timestamp: Date.now()
-    }, (response: any) => {
+    let payload;
+    try {
+      payload = parseSubmitAnswerPayload({
+        transcript: speechState.transcript,
+        timestamp: Date.now(),
+      });
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Invalid transcript';
+      return;
+    }
+
+    socket.emit('submit-answer', payload, (response: any) => {
       if (response.success) {
         hasSubmitted = true;
         mySimilarity = response.similarity;

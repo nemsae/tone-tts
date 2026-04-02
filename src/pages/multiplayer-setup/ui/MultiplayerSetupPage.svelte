@@ -1,10 +1,14 @@
 <script lang="ts">
   import { push } from 'svelte-spa-router';
   import { onMount, onDestroy } from 'svelte';
-  import { socketService, multiplayerGameStore } from '@/shared/lib';
-  import { gameSettingsStore, validateTopic } from '@/entities/session';
+  import {
+    MAX_PLAYER_NAME_LENGTH,
+    parseCreateRoomPayload,
+    socketService,
+    multiplayerGameStore,
+  } from '@/shared/lib';
+  import { gameSettingsStore } from '@/entities/session';
   import { get } from 'svelte/store';
-  import type { GameSettings as MultiplayerGameSettings } from '@/shared/lib/multiplayer-types';
   import { GameSettingsForm } from '@/widgets/game-settings-form';
   import { Button, Input } from '@/shared/ui';
   import styles from './multiplayer-setup.module.scss';
@@ -36,42 +40,30 @@
   });
 
   async function handleCreateRoom() {
-    if (!playerName.trim()) {
-      error = 'Please enter your name';
-      return;
-    }
-
     const storeState = get(gameSettingsStore);
-    const useCustomTopic = storeState.useCustomTopic;
-    const topic = useCustomTopic ? storeState.customTopic : storeState.selectedTopic;
-    if (!topic) {
-      error = 'Please select or enter a topic';
+    let payload;
+    try {
+      payload = parseCreateRoomPayload({
+        playerName,
+        settings: {
+          topic: storeState.useCustomTopic ? storeState.customTopic : storeState.selectedTopic,
+          length: storeState.length,
+          customLength: storeState.length === 'custom' ? storeState.customLength : undefined,
+          rounds: storeState.rounds,
+          roundTimeLimit: storeState.roundTimeLimitEnabled ? storeState.roundTimeLimit : null,
+          autoSubmitEnabled: storeState.autoSubmitEnabled,
+          autoSubmitDelay: storeState.autoSubmitDelay,
+        },
+      });
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Invalid room settings';
       return;
-    }
-
-    // Validate custom topic
-    if (useCustomTopic) {
-      const validationError = validateTopic(topic);
-      if (validationError) {
-        error = validationError;
-        return;
-      }
     }
 
     error = '';
     isCreatingRoom = true;
 
-    const settings: MultiplayerGameSettings = {
-      topic,
-      length: storeState.length,
-      customLength: storeState.length === 'custom' ? storeState.customLength : undefined,
-      rounds: storeState.rounds,
-      roundTimeLimit: storeState.roundTimeLimitEnabled ? storeState.roundTimeLimit : null,
-      autoSubmitEnabled: storeState.autoSubmitEnabled,
-      autoSubmitDelay: storeState.autoSubmitDelay,
-    };
-
-    socket.emit('create-room', { playerName: playerName.trim(), settings }, (response: any) => {
+    socket.emit('create-room', payload, (response: any) => {
       isCreatingRoom = false;
       if (response.success) {
         multiplayerGameStore.handleCreateRoom(response);
@@ -118,6 +110,7 @@
           <div class={styles.sectionContent}>
             <Input
               placeholder="Enter your name"
+              maxlength={MAX_PLAYER_NAME_LENGTH}
               bind:value={playerName}
             />
           </div>

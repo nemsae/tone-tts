@@ -1,5 +1,6 @@
 <script lang="ts">
   import { gameSettingsStore, PREDEFINED_TOPICS, TOPIC_MAX_LENGTH } from '@/entities/session';
+  import { MAX_CUSTOM_LENGTH, MIN_CUSTOM_LENGTH, MAX_ROUND_TIME_LIMIT, MIN_ROUND_TIME_LIMIT } from '@/shared/lib';
   import type { TwisterLength } from '@/shared/vendor';
   import { Button, Input, RangeSlider } from '@/shared/ui';
   import styles from './game-settings-form.module.scss';
@@ -37,7 +38,11 @@
       { value: 'long' as TwisterLength, label: 'Hard', words: '~20 words' },
     ];
     if (showCustomDifficulty) {
-      base.push({ value: 'custom' as TwisterLength, label: 'Custom', words: '5-40 words' });
+      base.push({
+        value: 'custom' as TwisterLength,
+        label: 'Custom',
+        words: `${MIN_CUSTOM_LENGTH}-${MAX_CUSTOM_LENGTH} words`,
+      });
     }
     return base;
   });
@@ -45,8 +50,8 @@
   const ROUND_MIN = 1;
   const ROUND_MAX = 10;
 
-  const TIMER_MIN = 10;
-  const TIMER_MAX = 120;
+  const TIMER_MIN = MIN_ROUND_TIME_LIMIT;
+  const TIMER_MAX = MAX_ROUND_TIME_LIMIT;
 
   const AUTO_SUBMIT_MIN = 500;
   const AUTO_SUBMIT_MAX = 5000;
@@ -120,8 +125,8 @@
               <span class={styles.customLengthLabel}>custom length</span>
               <span class={styles.customLengthValue}>{$gameSettingsStore.customLength} words</span>
               <RangeSlider
-                min={5}
-                max={40}
+                min={MIN_CUSTOM_LENGTH}
+                max={MAX_CUSTOM_LENGTH}
                 value={$gameSettingsStore.customLength}
                 oninput={(e) => gameSettingsStore.setCustomLength(Number((e.target as HTMLInputElement).value))}
               />
