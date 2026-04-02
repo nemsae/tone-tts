@@ -1,5 +1,11 @@
 import type { Twister, TwisterLength } from '@/shared/vendor';
 import { calculateSimilarity } from '@/shared/lib';
+import {
+  MAX_TOPIC_LENGTH,
+  TOPIC_MIN_LENGTH as VALIDATION_TOPIC_MIN_LENGTH,
+  sanitizeTopicInput,
+  validateTopicInput,
+} from '@/shared/lib';
 
 export interface GameSettings {
   topic: string;
@@ -10,55 +16,15 @@ export interface GameSettings {
   autoSubmitDelay?: number;
 }
 
-// Security constants for topic validation
-export const TOPIC_MIN_LENGTH = 2;
-export const TOPIC_MAX_LENGTH = 100;
+export const TOPIC_MIN_LENGTH = VALIDATION_TOPIC_MIN_LENGTH;
+export const TOPIC_MAX_LENGTH = MAX_TOPIC_LENGTH;
 
-/**
- * Sanitizes a custom topic string by:
- * 1. Trimming whitespace
- * 2. Removing HTML tags and script injection attempts
- * 3. Filtering out special characters that could cause issues
- * 4. Normalizing whitespace
- */
 export function sanitizeTopic(topic: string): string {
-  // Trim leading/trailing whitespace
-  let sanitized = topic.trim();
-
-  // Remove HTML tags (including script tags, img tags, etc.)
-  sanitized = sanitized.replace(/<[^>]*>/g, '');
-
-  // Remove potentially dangerous characters but keep common punctuation
-  // Allow: letters, numbers, spaces, hyphens, apostrophes, and basic punctuation
-  sanitized = sanitized.replace(/[^a-zA-Z0-9\s\-']/g, '');
-
-  // Normalize multiple spaces to single space
-  sanitized = sanitized.replace(/\s+/g, ' ');
-
-  // Trim again after normalization
-  return sanitized.trim();
+  return sanitizeTopicInput(topic);
 }
 
-/**
- * Validates a custom topic string.
- * Returns an error message if invalid, null if valid.
- */
 export function validateTopic(topic: string): string | null {
-  const sanitized = sanitizeTopic(topic);
-
-  if (sanitized.length === 0) {
-    return 'Topic cannot be empty';
-  }
-
-  if (sanitized.length < TOPIC_MIN_LENGTH) {
-    return `Topic must be at least ${TOPIC_MIN_LENGTH} characters`;
-  }
-
-  if (sanitized.length > TOPIC_MAX_LENGTH) {
-    return `Topic cannot exceed ${TOPIC_MAX_LENGTH} characters`;
-  }
-
-  return null;
+  return validateTopicInput(topic);
 }
 
 export interface RoundResult {

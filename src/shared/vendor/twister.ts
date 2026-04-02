@@ -1,4 +1,6 @@
-export type TwisterLength = 'short' | 'medium' | 'long' | 'custom';
+import type { TwisterLength as ValidationTwisterLength } from '@jaysonder/tts-validation';
+
+export type TwisterLength = ValidationTwisterLength;
 export type TwisterTopic = 'Animals' | 'Tech' | 'Food' | string;
 
 export interface Twister {

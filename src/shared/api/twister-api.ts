@@ -1,4 +1,5 @@
 import type { Twister, TwisterLength } from '@/shared/vendor';
+import { parseGenerateTwistersPayload } from '@/shared/lib';
 
 interface GenerateTwistersRequest {
   topic: string;
@@ -17,17 +18,19 @@ export async function generateTwisters({
   customLength,
   rounds = 1,
 }: GenerateTwistersRequest): Promise<Twister[]> {
+  const payload = parseGenerateTwistersPayload({
+    topic,
+    length,
+    customLength,
+    rounds,
+  });
+
   const response = await fetch(`${import.meta.env.VITE_API_URL}/api/generate`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      topic,
-      length,
-      ...(length === 'custom' && customLength !== undefined && { customLength }),
-      rounds,
-    }),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {

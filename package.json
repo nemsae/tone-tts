@@ -18,9 +18,11 @@
     "deploy": "sh scripts/deploy.sh"
   },
   "dependencies": {
+    "@jaysonder/tts-validation": "^0.1.0",
     "socket.io-client": "^4.7.0",
     "svelte": "^5.19.0",
-    "svelte-spa-router": "^5.0.0"
+    "svelte-spa-router": "^5.0.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

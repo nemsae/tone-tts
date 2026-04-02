@@ -1,7 +1,12 @@
 <script lang="ts">
   import { push } from 'svelte-spa-router';
   import { onMount, onDestroy } from 'svelte';
-  import { socketService, multiplayerGameStore } from '@/shared/lib';
+  import {
+    MAX_PLAYER_NAME_LENGTH,
+    parseJoinRoomPayload,
+    socketService,
+    multiplayerGameStore,
+  } from '@/shared/lib';
   import type { Player } from '@/shared/lib/multiplayer-types';
   import { Button, Input } from '@/shared/ui';
   import styles from './multiplayer-join.module.scss';
@@ -55,25 +60,21 @@
   });
 
   function handleJoinRoom() {
-    if (!playerName.trim()) {
-      error = 'Please enter your name';
-      return;
-    }
-
-    if (!roomCode.trim()) {
-      error = 'Please enter the room code';
-      return;
-    }
-
-    if (roomCode.trim().length !== 4) {
-      error = 'Room code must be 4 characters';
+    let payload;
+    try {
+      payload = parseJoinRoomPayload({
+        roomCode,
+        playerName,
+      });
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Invalid room details';
       return;
     }
 
     error = '';
     isJoining = true;
 
-    socket.emit('join-room', { roomCode: roomCode.trim().toUpperCase(), playerName: playerName.trim() }, (response: any) => {
+    socket.emit('join-room', payload, (response: any) => {
       isJoining = false;
       if (response.success) {
         players = response.game.players;
@@ -114,6 +115,7 @@
       <h2 class={styles.sectionTitle}>Your Name</h2>
       <Input
         placeholder="Enter your name"
+        maxlength={MAX_PLAYER_NAME_LENGTH}
         bind:value={playerName}
       />
     </div>
