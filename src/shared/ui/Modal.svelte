@@ -95,13 +95,6 @@
 
 {#if isOpen}
   <div class="modal-shell">
-    <button
-      type="button"
-      class="modal-backdrop"
-      aria-hidden="true"
-      tabindex="-1"
-      onclick={onClose}
-    ></button>
     <div
       bind:this={dialogElement}
       class="modal-content"
@@ -144,14 +137,7 @@
     justify-content: center;
     z-index: 1000;
     padding: $spacing-lg;
-  }
-
-  .modal-backdrop {
-    position: absolute;
-    inset: 0;
-    border: none;
     background: rgba(0, 0, 0, 0.5);
-    cursor: default;
   }
 
   .modal-content {
