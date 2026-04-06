@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import type { Snippet } from 'svelte';
   import Button from './Button.svelte';
 
@@ -10,7 +11,7 @@
     confirmLabel?: string;
     cancelLabel?: string;
     onConfirm?: () => void;
-    confirmVariant?: 'primary' | 'secondary';
+    confirmVariant?: 'primary' | 'secondary' | 'danger';
   }
 
   let {
@@ -24,19 +25,86 @@
     confirmVariant = 'primary',
   }: Props = $props();
 
-  function handleBackdropClick(e: MouseEvent) {
-    if (e.target === e.currentTarget) {
+  let dialogElement = $state<HTMLDivElement | null>(null);
+  let restoreFocusTarget = $state<HTMLElement | null>(null);
+
+  const titleId = `modal-title-${Math.random().toString(36).slice(2, 10)}`;
+
+  function getFocusableElements(): HTMLElement[] {
+    if (!dialogElement) {
+      return [];
+    }
+
+    return Array.from(
+      dialogElement.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter((element) => !element.hasAttribute('disabled') && element.getAttribute('aria-hidden') !== 'true');
+  }
+
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
       onClose();
+      return;
+    }
+
+    if (event.key !== 'Tab') {
+      return;
+    }
+
+    const focusableElements = getFocusableElements();
+
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      dialogElement?.focus();
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    const activeElement = document.activeElement;
+
+    if (event.shiftKey && activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
     }
   }
+
+  $effect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    restoreFocusTarget = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+    void tick().then(() => {
+      const [firstFocusableElement] = getFocusableElements();
+      (firstFocusableElement ?? dialogElement)?.focus();
+    });
+
+    return () => {
+      restoreFocusTarget?.focus();
+      restoreFocusTarget = null;
+    };
+  });
 </script>
 
 {#if isOpen}
-  <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="modal-backdrop" onclick={handleBackdropClick}>
-    <div class="modal-content">
-      <h2 class="modal-title">{title}</h2>
+  <div class="modal-shell">
+    <div
+      bind:this={dialogElement}
+      class="modal-content"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      tabindex="-1"
+      onkeydown={handleKeydown}
+    >
+      <h2 class="modal-title" id={titleId}>{title}</h2>
       <div class="modal-body">
         {#if children}
           {@render children()}
@@ -61,18 +129,19 @@
 <style lang="scss">
   @use '../../app/styles/variables' as *;
 
-  .modal-backdrop {
+  .modal-shell {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
     padding: $spacing-lg;
+    background: rgba(0, 0, 0, 0.5);
   }
 
   .modal-content {
+    position: relative;
     background: $color-surface-container-lowest;
     border-radius: $radius-lg;
     padding: $spacing-xl;
@@ -80,6 +149,12 @@
     width: 100%;
     max-height: 80vh;
     overflow-y: auto;
+    z-index: 1;
+
+    &:focus-visible {
+      outline: 2px solid $color-primary;
+      outline-offset: 4px;
+    }
   }
 
   .modal-title {

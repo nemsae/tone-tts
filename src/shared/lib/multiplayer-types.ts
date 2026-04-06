@@ -76,6 +76,17 @@ export interface SubmitAnswerResponse {
   similarity: number;
 }
 
+export interface SocketActionAck {
+  success: boolean;
+  error?: string;
+}
+
+export interface CreateRoomAck extends SocketActionAck, CreateRoomResponse {}
+
+export interface JoinRoomAck extends SocketActionAck, JoinRoomResponse {}
+
+export interface SubmitAnswerAck extends SocketActionAck, SubmitAnswerResponse {}
+
 export interface GetRoomStateResponse {
   game: GameState;
   playerId: string;

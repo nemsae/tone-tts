@@ -8,6 +8,9 @@
   const numberFormatter = new Intl.NumberFormat('en-US');
 
   let activeLobbyPlayerCount = $state(0);
+  let visibleLobbyAvatars = $derived(
+    Array.from({ length: Math.min(activeLobbyPlayerCount, 3) }, (_, index) => index)
+  );
 
   function handleSolo() {
     push('/solo-setup');
@@ -28,8 +31,7 @@
   async function loadActiveLobbyPlayerCount() {
     try {
       activeLobbyPlayerCount = await getActiveLobbyPlayerCount();
-    } catch (error) {
-      console.error('Failed to load active lobby player count:', error);
+    } catch {
       activeLobbyPlayerCount = 0;
     }
   }
@@ -45,26 +47,19 @@
       window.clearInterval(refreshTimer);
     };
   });
-
-  // const activeRooms = [
-  //   { name: "jazz & swing session", players: "3/4", level: "level 12", type: 'public' },
-  //   { name: "midnight rhythm", players: "2/2", level: "pro", type: 'private' },
-  //   { name: "disco inferno", players: "1/8", level: "beginner", type: 'public' },
-  //   { name: "techno pulse", players: "6/8", level: "expert", type: 'public' },
-  // ];
 </script>
 
 <div class={styles.page}>
   <div class={styles.header}>
     <div class={styles.headerSpacer}></div>
     <div class={styles.headerActions}>
-      <button class={styles.iconButton} aria-label="Settings">
+      <button type="button" class={styles.iconButton} aria-label="Settings">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3" />
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
         </svg>
       </button>
-      <button class={styles.iconButton} aria-label="Help">
+      <button type="button" class={styles.iconButton} aria-label="Help">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10" />
           <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
@@ -86,7 +81,7 @@
       <h2 class={styles.sectionTitle}>Premium Experience</h2>
       <p class={styles.sectionSubtitle}>multiplayer lounge</p>
 
-      <div class={styles.loungeCard} onclick={handleMultiplayerLounge} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleMultiplayerLounge(); }}} role="button" tabindex="0">
+      <div class={styles.loungeCard}>
         <div class={styles.loungeCardContent}>
           <div class={styles.loungeIcon}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -97,14 +92,20 @@
             </svg>
           </div>
           <div class={styles.quickActions}>
-            <button class={styles.quickAction} onclick={(e) => { e.stopPropagation(); handleCreateRoom(); }}>
+            <button type="button" class="{styles.quickAction} {styles.primaryQuickAction}" onclick={handleMultiplayerLounge}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              open lounge
+            </button>
+            <button type="button" class={styles.quickAction} onclick={handleCreateRoom}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10" />
                 <path d="M12 8v8M8 12h8" />
               </svg>
               create a room
             </button>
-            <button class={styles.quickAction} onclick={(e) => { e.stopPropagation(); handleJoinRoom(); }}>
+            <button type="button" class={styles.quickAction} onclick={handleJoinRoom}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
               </svg>
@@ -114,7 +115,7 @@
         </div>
         <div class={styles.lobbyInfo}>
           <span class={styles.avatarStack}>
-            {#each {length: Math.min(activeLobbyPlayerCount, 3)} as _}
+            {#each visibleLobbyAvatars as avatarIndex (avatarIndex)}
               <span class={styles.avatar}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -143,7 +144,7 @@
         Sharpen your skills or enjoy a peaceful solo session. Your personal records await.
       </p>
 
-      <div class={styles.soloCard} onclick={handleSolo} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSolo(); }}} role="button" tabindex="0">
+      <div class={styles.soloCard}>
         <div class={styles.soloFeatures}>
           <div class={styles.featureItem}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -165,7 +166,7 @@
             recent scores
           </div>
         </div>
-        <button class={styles.soloButton}>
+        <button type="button" class={styles.soloButton} onclick={handleSolo}>
           <span>start solo game</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="5 3 19 12 5 21 5 3" />
@@ -173,36 +174,5 @@
         </button>
       </div>
     </div>
-
-    <!-- <div class={styles.section}>
-      <h2 class={styles.sectionTitle}>active rooms</h2>
-      
-      <div class={styles.roomList}>
-        {#each activeRooms as room}
-          <div class={styles.roomItem}>
-            <div class={styles.roomIcon}>
-              {#if room.type === 'public'}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 16v-4M12 8h.01" />
-                </svg>
-              {:else}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-              {/if}
-            </div>
-            <div class={styles.roomInfo}>
-              <span class={styles.roomName}>{room.name}</span>
-              <span class={styles.roomDetails}>{room.players} players • {room.level}</span>
-            </div>
-            <button class={styles.joinButton} onclick={handleJoinRoom}>
-              JOIN ROOM
-            </button>
-          </div>
-        {/each}
-      </div>
-    </div> -->
   </div>
 </div>

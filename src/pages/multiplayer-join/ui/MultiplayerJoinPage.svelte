@@ -3,11 +3,17 @@
   import { onMount, onDestroy } from 'svelte';
   import {
     MAX_PLAYER_NAME_LENGTH,
+    ROOM_CODE_LENGTH,
     parseJoinRoomPayload,
     socketService,
     multiplayerGameStore,
   } from '@/shared/lib';
-  import type { Player } from '@/shared/lib/multiplayer-types';
+  import type {
+    GameStartedEvent,
+    JoinRoomAck,
+    PlayerJoinedEvent,
+    PlayerLeftEvent,
+  } from '@/shared/lib/multiplayer-types';
   import { Button, Input } from '@/shared/ui';
   import styles from './multiplayer-join.module.scss';
 
@@ -15,8 +21,6 @@
   let roomCode = $state('');
   let isJoining = $state(false);
   let error = $state('');
-  let players = $state<Player[]>([]);
-  let gameStarted = $state(false);
 
   const socket = socketService.connect();
 
@@ -33,19 +37,16 @@
       error = `Connection error: ${err.message}`;
     });
 
-    socket.on('player-joined', (data: { player: Player; players: Player[]; game: any }) => {
-      players = data.players;
+    socket.on('player-joined', (data: PlayerJoinedEvent) => {
       multiplayerGameStore.handlePlayerJoined(data);
     });
 
-    socket.on('player-left', (data: { playerId: string; players: Player[] }) => {
-      players = data.players;
+    socket.on('player-left', (data: PlayerLeftEvent) => {
       multiplayerGameStore.handlePlayerLeft(data);
     });
 
-    socket.on('game-started', (data: { game: any; currentTwister: any; roundStartTime: number }) => {
+    socket.on('game-started', (data: GameStartedEvent) => {
       multiplayerGameStore.handleGameStarted(data);
-      gameStarted = true;
       push('/multiplayer-game');
     });
   });
@@ -74,10 +75,9 @@
     error = '';
     isJoining = true;
 
-    socket.emit('join-room', payload, (response: any) => {
+    socket.emit('join-room', payload, (response: JoinRoomAck) => {
       isJoining = false;
       if (response.success) {
-        players = response.game.players;
         multiplayerGameStore.handleJoinRoom(response);
         push('/multiplayer-lobby');
       } else {
@@ -90,12 +90,6 @@
     multiplayerGameStore.reset();
     socketService.disconnect();
     push('/');
-  }
-
-  function handleCopyCode() {
-    if (roomCode) {
-      navigator.clipboard.writeText(roomCode.trim().toUpperCase());
-    }
   }
 </script>
 
@@ -124,7 +118,7 @@
       <h2 class={styles.sectionTitle}>Room Code</h2>
       <Input
         placeholder="ABCD"
-        maxlength={4}
+        maxlength={ROOM_CODE_LENGTH}
         bind:value={roomCode}
         oninput={() => {
           roomCode = roomCode.toUpperCase();

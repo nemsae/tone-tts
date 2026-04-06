@@ -1,31 +1,16 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLButtonAttributes } from 'svelte/elements';
 
-  interface Props {
-    variant?: 'primary' | 'secondary' | 'tertiary';
-    type?: 'button' | 'submit' | 'reset';
-    disabled?: boolean;
-    onclick?: () => void;
+  interface Props extends HTMLButtonAttributes {
+    variant?: 'primary' | 'secondary' | 'tertiary' | 'danger';
     children?: Snippet;
-    class?: string;
   }
 
-  let {
-    variant = 'primary',
-    type = 'button',
-    disabled = false,
-    onclick,
-    children,
-    class: className = '',
-  }: Props = $props();
+  let { variant = 'primary', children, class: className = '', ...restProps }: Props = $props();
 </script>
 
-<button
-  class="btn btn-{variant} {className}"
-  {type}
-  {disabled}
-  {onclick}
->
+<button class="btn btn-{variant} {className}" {...restProps}>
   {#if children}
     {@render children()}
   {/if}
@@ -94,6 +79,19 @@
 
     &:hover:not(:disabled) {
       color: $color-text;
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+  }
+
+  .btn-danger {
+    background: $color-error;
+    color: $color-on-primary;
+
+    &:hover:not(:disabled) {
+      filter: brightness(0.95);
     }
 
     &:active:not(:disabled) {

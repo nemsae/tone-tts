@@ -68,7 +68,7 @@
       </section>
     {/if}
 
-    <form class={styles.form} onsubmit={(e) => { e.preventDefault(); onSubmit(); }}>
+    <form class={styles.form} onsubmit={(event) => { event.preventDefault(); onSubmit(); }}>
       {#if children}
         {@render children()}
       {/if}
@@ -80,7 +80,7 @@
         </div>
         <div class={styles.sectionContent}>
           <div class={styles.topicGrid}>
-            {#each PREDEFINED_TOPICS as topic}
+            {#each PREDEFINED_TOPICS as topic (topic)}
               <label class={styles.topicLabel}>
                 <input
                   type="radio"
@@ -110,7 +110,7 @@
         </div>
         <div class={styles.sectionContent}>
           <div class={styles.difficultyButtons}>
-            {#each DIFFICULTY_OPTIONS as option}
+            {#each DIFFICULTY_OPTIONS as option (option.value)}
               <button
                 type="button"
                 class="{styles.difficultyButton} {$gameSettingsStore.length === option.value ? styles.selected : ''}"
@@ -224,7 +224,7 @@
       {/if}
 
       <div class={styles.ctaSection}>
-        <Button type="submit" disabled={isLoading} onclick={onSubmit}>
+        <Button type="submit" disabled={isLoading}>
           {isLoading ? 'Loading...' : submitText}
         </Button>
       </div>

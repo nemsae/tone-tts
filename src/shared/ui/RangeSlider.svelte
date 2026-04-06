@@ -1,12 +1,12 @@
 <script lang="ts">
-  interface Props {
+  import type { HTMLInputAttributes } from 'svelte/elements';
+
+  interface Props extends Omit<HTMLInputAttributes, 'type' | 'value'> {
     min?: number;
     max?: number;
     step?: number;
     value?: number;
     showLabels?: boolean;
-    oninput?: (e: Event) => void;
-    class?: string;
   }
 
   let {
@@ -15,8 +15,8 @@
     step = 1,
     value = $bindable(50),
     showLabels = true,
-    oninput,
     class: className = '',
+    ...restProps
   }: Props = $props();
 </script>
 
@@ -28,7 +28,7 @@
     {max}
     {step}
     bind:value
-    {oninput}
+    {...restProps}
   />
   {#if showLabels}
     <div class="range-labels">

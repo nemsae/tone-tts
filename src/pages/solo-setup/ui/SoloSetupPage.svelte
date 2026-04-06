@@ -6,7 +6,6 @@
   import { parseGenerateTwistersPayload } from '@/shared/lib';
   import { get } from 'svelte/store';
   import { GameSettingsForm } from '@/widgets/game-settings-form';
-  import styles from './solo-setup.module.scss';
 
   let isLoading = $state(false);
   let error = $state('');

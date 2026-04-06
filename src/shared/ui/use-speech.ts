@@ -29,6 +29,25 @@ function createSpeechStore() {
   let recognition: SpeechRecognition | null = null;
   let isRestarting = false;
 
+  function createRecognition(): SpeechRecognition | null {
+    if (!isSpeechSupported) {
+      return null;
+    }
+
+    const handlers = createRecognitionHandlers();
+    const RecognitionConstructor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
+    const nextRecognition = new RecognitionConstructor();
+    nextRecognition.continuous = true;
+    nextRecognition.interimResults = true;
+    nextRecognition.lang = 'en-US';
+    nextRecognition.maxAlternatives = 1;
+    nextRecognition.onresult = handlers.onresult;
+    nextRecognition.onerror = handlers.onerror;
+    nextRecognition.onend = handlers.onend;
+
+    return nextRecognition;
+  }
+
   function createRecognitionHandlers() {
     return {
       onresult: (event: SpeechRecognitionEvent) => {
@@ -76,20 +95,7 @@ function createSpeechStore() {
   }
 
   function init() {
-    if (!isSpeechSupported) {
-      return;
-    }
-
-    const handlers = createRecognitionHandlers();
-    const RecognitionConstructor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
-    recognition = new RecognitionConstructor();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-    recognition.maxAlternatives = 1;
-    recognition.onresult = handlers.onresult;
-    recognition.onerror = handlers.onerror;
-    recognition.onend = handlers.onend;
+    recognition = createRecognition();
   }
 
   function startListening() {
@@ -129,19 +135,10 @@ function createSpeechStore() {
       return;
     }
 
-    const handlers = createRecognitionHandlers();
-    const RecognitionConstructor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
-    recognition = new RecognitionConstructor();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-    recognition.maxAlternatives = 1;
-    recognition.onresult = handlers.onresult;
-    recognition.onerror = handlers.onerror;
-    recognition.onend = handlers.onend;
+    recognition = createRecognition();
 
     try {
-      recognition.start();
+      recognition?.start();
       store.update((state) => ({ ...state, isListening: true }));
     } catch (startError) {
       if (startError instanceof DOMException && startError.name === 'InvalidStateError') {
@@ -169,19 +166,10 @@ function createSpeechStore() {
     isRestarting = true;
     recognition?.stop();
 
-    const handlers = createRecognitionHandlers();
-    const RecognitionConstructor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
-    recognition = new RecognitionConstructor();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-    recognition.maxAlternatives = 1;
-    recognition.onresult = handlers.onresult;
-    recognition.onerror = handlers.onerror;
-    recognition.onend = handlers.onend;
+    recognition = createRecognition();
 
     try {
-      recognition.start();
+      recognition?.start();
       store.update((state) => ({ ...state, isListening: true }));
     } catch (startError) {
       isRestarting = false;

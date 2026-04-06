@@ -118,7 +118,6 @@
   background: $color-primary-container;
   border-radius: $radius-md;
   padding: $spacing-xl;
-  cursor: pointer;
   transition: all $transition-fast;
   margin-bottom: $spacing-lg;
 
@@ -153,6 +152,7 @@
 
 .quickActions {
   display: flex;
+  flex-wrap: wrap;
   gap: $spacing-sm;
 
   @media (max-width: 768px) {
@@ -189,6 +189,11 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+.primaryQuickAction {
+  background: $color-on-primary-container;
+  color: $color-primary-container;
 }
 
 .lobbyInfo {
@@ -244,7 +249,6 @@
   border: none;
   border-radius: $radius-md;
   padding: $spacing-lg;
-  cursor: pointer;
   transition: all $transition-fast;
 
   &:hover {
@@ -306,98 +310,5 @@
 
   &:hover {
     opacity: 0.9;
-  }
-}
-
-.roomList {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-}
-
-.roomItem {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  padding: $spacing-md;
-  background: $color-surface-container-lowest;
-  border: none;
-  border-radius: $radius-sm;
-  transition: all $transition-fast;
-
-  @media (max-width: 768px) {
-    flex-wrap: wrap;
-  }
-
-  &:hover {
-    background: $color-surface-container;
-  }
-}
-
-.roomIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: $radius-sm;
-  background: $color-surface-container;
-  color: $color-text-secondary;
-
-  svg {
-    width: 14px;
-    height: 14px;
-  }
-}
-
-.roomInfo {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-
-  @media (max-width: 768px) {
-    order: 2;
-    width: 100%;
-    margin-top: $spacing-xs;
-  }
-}
-
-.roomName {
-  font-family: $font-family-base;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: $color-text;
-}
-
-.roomDetails {
-  font-family: $font-family-base;
-  font-size: 0.75rem;
-  color: $color-text-secondary;
-}
-
-.joinButton {
-  padding: $spacing-xs $spacing-md;
-  background: transparent;
-  border: 1px solid $color-outline;
-  border-radius: $radius-sm;
-  color: $color-text;
-  font-family: $font-family-base;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: all $transition-fast;
-
-  @media (max-width: 768px) {
-    order: 3;
-    width: 100%;
-    margin-top: $spacing-xs;
-  }
-
-  &:hover {
-    background: $color-primary;
-    border-color: $color-primary;
-    color: $color-on-primary;
   }
 }

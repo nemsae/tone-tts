@@ -29,13 +29,13 @@
     <span class={twisterCardStyles.difficulty}>{difficultyDisplay}</span>
   </div>
   <div class={twisterCardStyles.text}>
-    {#each words as word, index}
+    {#each words as word, index (`${index}-${word}`)}
       {@const isMatched = matchedWords?.[index]}
       {@const hasBeenAttempted = wordsAttempted !== undefined && index < wordsAttempted}
       <span
         class="{twisterCardStyles.word} {isMatched === true ? twisterCardStyles.matched : ''} {isMatched === false && hasBeenAttempted ? twisterCardStyles.unmatched : ''}"
       >
-        {word}{' '}
+        {word}{index < words.length - 1 ? ' ' : ''}
       </span>
     {/each}
   </div>
