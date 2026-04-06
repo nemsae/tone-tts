@@ -1,40 +1,23 @@
 <script lang="ts">
-  interface Props {
-    type?: 'text' | 'number' | 'email' | 'password';
+  import type { HTMLInputAttributes, HTMLInputTypeAttribute } from 'svelte/elements';
+
+  interface Props extends Omit<HTMLInputAttributes, 'type' | 'value'> {
+    type?: HTMLInputTypeAttribute;
     value?: string | number;
-    placeholder?: string;
-    disabled?: boolean;
     error?: string;
-    maxlength?: number;
-    oninput?: (e: Event) => void;
-    onchange?: (e: Event) => void;
-    class?: string;
   }
 
-  let {
-    type = 'text',
-    value = $bindable(''),
-    placeholder = '',
-    disabled = false,
-    error = '',
-    maxlength,
-    oninput,
-    onchange,
-    class: className = '',
-  }: Props = $props();
+  let { type = 'text', value = $bindable(''), error = '', class: className = '', ...restProps }: Props = $props();
 </script>
 
 <div class="input-wrapper {className}">
   <input
     {type}
     bind:value
-    {placeholder}
-    {disabled}
-    {maxlength}
     class="input-field"
     class:has-error={!!error}
-    {oninput}
-    {onchange}
+    aria-invalid={error ? 'true' : undefined}
+    {...restProps}
   />
   {#if error}
     <span class="input-error">{error}</span>

@@ -7,6 +7,7 @@
     socketService,
     multiplayerGameStore,
   } from '@/shared/lib';
+  import type { CreateRoomAck } from '@/shared/lib/multiplayer-types';
   import { gameSettingsStore } from '@/entities/session';
   import { get } from 'svelte/store';
   import { GameSettingsForm } from '@/widgets/game-settings-form';
@@ -63,7 +64,7 @@
     error = '';
     isCreatingRoom = true;
 
-    socket.emit('create-room', payload, (response: any) => {
+    socket.emit('create-room', payload, (response: CreateRoomAck) => {
       isCreatingRoom = false;
       if (response.success) {
         multiplayerGameStore.handleCreateRoom(response);
@@ -101,21 +102,19 @@
       showRoundTimeLimit={true}
       showAutoSubmit={true}
     >
-      {#snippet children()}
-        <div class={styles.section}>
-          <div class={styles.sectionHeader}>
-            <h2 class={styles.sectionTitle}>your name</h2>
-            <p class={styles.sectionDescription}>how players will see you</p>
-          </div>
-          <div class={styles.sectionContent}>
-            <Input
-              placeholder="Enter your name"
-              maxlength={MAX_PLAYER_NAME_LENGTH}
-              bind:value={playerName}
-            />
-          </div>
+      <div class={styles.section}>
+        <div class={styles.sectionHeader}>
+          <h2 class={styles.sectionTitle}>your name</h2>
+          <p class={styles.sectionDescription}>how players will see you</p>
         </div>
-      {/snippet}
+        <div class={styles.sectionContent}>
+          <Input
+            placeholder="Enter your name"
+            maxlength={MAX_PLAYER_NAME_LENGTH}
+            bind:value={playerName}
+          />
+        </div>
+      </div>
     </GameSettingsForm>
   </div>
 </div>

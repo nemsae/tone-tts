@@ -2,16 +2,36 @@
   import { push } from 'svelte-spa-router';
   import { onMount } from 'svelte';
   import type { Session, ScoringResult } from '@/entities/session';
-  import { scoreTwister, getCurrentTwister, advanceSession, addRoundResult, isSessionComplete, calculateAccuracy, saveSession, loadSession, clearSession, saveFinalResult } from '@/entities/session';
+  import {
+    scoreTwister,
+    getCurrentTwister,
+    advanceSession,
+    addRoundResult,
+    isSessionComplete,
+    calculateAccuracy,
+    saveSession,
+    loadSession,
+    clearSession,
+    saveFinalResult,
+  } from '@/entities/session';
   import { speechStore, Modal } from '@/shared/ui';
   import GameHud from './GameHud.svelte';
   import TwisterCard from './TwisterCard.svelte';
   import styles from './game-session.module.scss';
 
+  const DEFAULT_AUTO_CHECK_DELAY = 1500;
+  const ROUND_ADVANCE_DELAY_MS = 500;
+  const SUCCESS_DISPLAY_DELAY_MS = 1500;
+  const TIMER_INTERVAL_MS = 100;
+  const DIFFICULTY_LABELS = {
+    short: 'Easy',
+    medium: 'Medium',
+    long: 'Hard',
+    custom: 'Custom',
+  } as const;
+
   let session = $state<Session | null>(null);
   let scoringResult = $state<ScoringResult | null>(null);
-  let liveMatchedWords = $state<boolean[] | undefined>(undefined);
-  let liveWordsAttempted = $state<number | undefined>(undefined);
   let gameStarted = $state(false);
   let elapsedTime = $state(0);
   let gameStartTime = $state<number | null>(null);
@@ -21,20 +41,35 @@
   let totalPausedTime = $state(0);
   let showSkipModal = $state(false);
 
-  const DEFAULT_AUTO_CHECK_DELAY = 1500;
   let autoCheckDelay = $derived(session?.settings?.autoSubmitDelay ?? DEFAULT_AUTO_CHECK_DELAY);
   let autoCheckEnabled = $derived(session?.settings?.autoSubmitEnabled ?? false);
   let autoCheckTimer: ReturnType<typeof setTimeout> | null = null;
   let timerInterval: ReturnType<typeof setInterval> | null = null;
-  let elapsedTimeRef = 0;
+  const currentTwister = $derived(session ? getCurrentTwister(session) : null);
+  const liveScorePreview = $derived(
+    currentTwister && $speechStore.isListening && $speechStore.transcript
+      ? scoreTwister($speechStore.transcript, currentTwister.text)
+      : null
+  );
+  const difficultyLabel = $derived.by(() => {
+    const settings = session?.settings;
 
-  let speechState = $state({ isListening: false, transcript: '', error: null as string | null });
+    if (!settings) {
+      return '';
+    }
+
+    const label = DIFFICULTY_LABELS[settings.length];
+
+    if (settings.length === 'custom' && settings.customLength) {
+      return `${label} (${settings.customLength} words)`;
+    }
+
+    return label;
+  });
 
   onMount(() => {
     session = loadSession();
-    const unsubscribe = speechStore.subscribe((state) => {
-      speechState = state;
-    });
+    void checkMicPermission();
 
     const handleBeforeUnload = () => {
       speechStore.clearTranscript();
@@ -42,25 +77,42 @@
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-      unsubscribe();
+      if (autoCheckTimer) {
+        clearTimeout(autoCheckTimer);
+      }
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+      speechStore.stopListening();
+      speechStore.clearTranscript();
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   });
 
-  function handleComplete(result: { accuracy: number; elapsedTime: number }) {
-    saveFinalResult({ accuracy: result.accuracy, elapsedTime: result.elapsedTime });
+  async function checkMicPermission() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+      hasMicPermission = true;
+    } catch {
+      hasMicPermission = false;
+    }
+  }
+
+  function handleComplete(accuracy: number, finalElapsedTime: number) {
+    saveFinalResult({ accuracy, elapsedTime: finalElapsedTime });
     clearSession();
     speechStore.stopListening();
     speechStore.clearTranscript();
     push('/solo-result');
   }
 
-  const currentTwister = $derived(session ? getCurrentTwister(session) : null);
-
   function handleScore() {
-    if (!currentTwister || !speechState.transcript) return;
+    if (!currentTwister || !session || !$speechStore.transcript) {
+      return;
+    }
 
-    const result = scoreTwister(speechState.transcript, currentTwister.text);
+    const result = scoreTwister($speechStore.transcript, currentTwister.text);
     scoringResult = result;
 
     if (result.isMatch) {
@@ -74,64 +126,29 @@
   }
 
   $effect(() => {
-    const currentSpeechState = speechState;
-    const listening = currentSpeechState.isListening;
-    const text = currentSpeechState.transcript;
     const shouldCheck = autoCheckEnabled && autoCheckDelay > 0;
 
-    if (!listening) {
-      liveMatchedWords = undefined;
-      liveWordsAttempted = undefined;
-      if (autoCheckTimer) {
-        clearTimeout(autoCheckTimer);
-        autoCheckTimer = null;
-      }
-      return;
+    if (autoCheckTimer) {
+      clearTimeout(autoCheckTimer);
+      autoCheckTimer = null;
     }
 
-    if (text && shouldCheck) {
-      if (autoCheckTimer) {
-        clearTimeout(autoCheckTimer);
-      }
+    if ($speechStore.isListening && $speechStore.transcript && shouldCheck) {
       autoCheckTimer = setTimeout(() => {
         handleScore();
       }, autoCheckDelay);
     }
   });
 
-  $effect(() => {
-    const twister = currentTwister;
-    const text = speechState.transcript;
-    if (!twister || !text) {
-      return;
-    }
-
-    const result = scoreTwister(text, twister.text);
-    liveMatchedWords = result.matchedWords;
-    liveWordsAttempted = result.wordsAttempted;
-  });
-
-  $effect(() => {
-    const checkMicPermission = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach((track) => track.stop());
-        hasMicPermission = true;
-      } catch {
-        hasMicPermission = false;
-      }
-    };
-    checkMicPermission();
-  });
-
   function handleNext(sessionToUse?: Session) {
     const sessionToAdvance = sessionToUse ?? session;
 
-    if (!currentTwister) return;
+    if (!currentTwister || !sessionToAdvance) {
+      return;
+    }
 
     scoringResult = null;
-    liveMatchedWords = undefined;
-    liveWordsAttempted = undefined;
+
     if (autoCheckTimer) {
       clearTimeout(autoCheckTimer);
       autoCheckTimer = null;
@@ -144,18 +161,19 @@
       const nextSession = advanceSession(sessionToAdvance);
 
       if (isSessionComplete(nextSession)) {
-        const accuracy = calculateAccuracy(nextSession);
-        handleComplete({ accuracy, elapsedTime: elapsedTimeRef });
+        handleComplete(calculateAccuracy(nextSession), elapsedTime);
       } else {
         session = nextSession;
         saveSession(nextSession);
         speechStore.startListening();
       }
-    }, 500);
+    }, ROUND_ADVANCE_DELAY_MS);
   }
 
   function handleSkip() {
-    if (!currentTwister) return;
+    if (!currentTwister || !session) {
+      return;
+    }
 
     const result = scoreTwister('', currentTwister.text);
     result.isMatch = false;
@@ -174,25 +192,26 @@
     if (scoringResult?.isMatch) {
       const timer = setTimeout(() => {
         handleNext();
-      }, 1500);
+      }, SUCCESS_DISPLAY_DELAY_MS);
       return () => clearTimeout(timer);
     }
   });
 
   $effect(() => {
-    if (gameStarted && gameStartTime && !isPaused) {
+    const currentGameStartTime = gameStartTime;
+
+    if (gameStarted && currentGameStartTime && !isPaused) {
       timerInterval = setInterval(() => {
         const currentTime = Date.now();
         const pausedTime = pauseStartTime ? currentTime - pauseStartTime : 0;
-        const newElapsedTime = currentTime - gameStartTime - totalPausedTime - pausedTime;
-        elapsedTime = newElapsedTime;
-        elapsedTimeRef = newElapsedTime;
-      }, 100);
+        elapsedTime = currentTime - currentGameStartTime - totalPausedTime - pausedTime;
+      }, TIMER_INTERVAL_MS);
     }
 
     return () => {
       if (timerInterval) {
         clearInterval(timerInterval);
+        timerInterval = null;
       }
     };
   });
@@ -219,7 +238,7 @@
   }
 </script>
 
-{#if !currentTwister}
+{#if !currentTwister || !session}
   <div class={styles.loading}>Loading...</div>
 {:else}
   <div class={styles.session}>
@@ -233,20 +252,7 @@
           </div>
           <div class={styles.gameInfoItem}>
             <span class={styles.gameInfoLabel}>Difficulty:</span>
-            <span class={styles.gameInfoValue}>
-              {session.settings?.length === 'short'
-                ? 'Easy'
-                : session.settings?.length === 'medium'
-                  ? 'Medium'
-                  : session.settings?.length === 'long'
-                    ? 'Hard'
-                    : session.settings?.length === 'custom'
-                      ? 'Custom'
-                      : session.settings?.length}
-              {#if session.settings?.length === 'custom' && session.settings?.customLength}
-                ({session.settings.customLength} words)
-              {/if}
-            </span>
+            <span class={styles.gameInfoValue}>{difficultyLabel}</span>
           </div>
           <div class={styles.gameInfoItem}>
             <span class={styles.gameInfoLabel}>Rounds:</span>
@@ -269,18 +275,18 @@
 
         <TwisterCard
           twister={currentTwister}
-          matchedWords={scoringResult?.matchedWords ?? liveMatchedWords}
-          wordsAttempted={scoringResult?.wordsAttempted ?? liveWordsAttempted}
-          settings={session.settings}
+          matchedWords={scoringResult?.matchedWords ?? liveScorePreview?.matchedWords}
+          wordsAttempted={scoringResult?.wordsAttempted ?? liveScorePreview?.wordsAttempted}
+          settings={session?.settings}
         />
 
         <div class={styles.controls}>
           <div class={styles.transcript}>
-            {speechState.transcript || (speechState.isListening ? 'Listening...' : 'Press the button and speak')}
+            {$speechStore.transcript || ($speechStore.isListening ? 'Listening...' : 'Press the button and speak')}
           </div>
 
-          {#if speechState.error}
-            <div class={styles.error}>{speechState.error}</div>
+          {#if $speechStore.error}
+            <div class={styles.error}>{$speechStore.error}</div>
           {/if}
 
           {#if scoringResult}
@@ -294,7 +300,7 @@
           {/if}
 
           <div class={styles.buttons}>
-            {#if !speechState.isListening}
+            {#if !$speechStore.isListening}
               <button class={styles.micButton} onclick={() => speechStore.startListening()}>
                 Start Listening
               </button>
@@ -302,7 +308,7 @@
               <button class="{styles.micButton} {styles.listening}" onclick={handlePause}>
                 Stop
               </button>
-              {#if !autoCheckEnabled && speechState.transcript}
+              {#if !autoCheckEnabled && $speechStore.transcript}
                 <button class={styles.submitButton} onclick={handleScore}>
                   Submit Answer
                 </button>
@@ -313,11 +319,11 @@
               Skip
             </button>
 
-              {#if speechState.transcript}
-                <button class={styles.resetButton} onclick={() => speechStore.clearTranscript(true)}>
-                  Reset
-                </button>
-              {/if}
+            {#if $speechStore.transcript}
+              <button class={styles.resetButton} onclick={() => speechStore.clearTranscript(true)}>
+                Reset
+              </button>
+            {/if}
           </div>
         </div>
 

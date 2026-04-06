@@ -1,18 +1,10 @@
 <script lang="ts">
   import { push } from 'svelte-spa-router';
-  import { onMount } from 'svelte';
   import { multiplayerGameStore } from '@/shared/lib';
-  import type { LeaderboardEntry } from '@/shared/lib/multiplayer-types';
   import styles from './multiplayer-result.module.scss';
 
-  let leaderboard = $state<LeaderboardEntry[]>([]);
-  let roomCode = $state<string | null>(null);
-
-  onMount(() => {
-    const store = $multiplayerGameStore;
-    leaderboard = store.leaderboard;
-    roomCode = store.roomCode;
-  });
+  let leaderboard = $derived($multiplayerGameStore.leaderboard);
+  let roomCode = $derived($multiplayerGameStore.roomCode);
 
   function handlePlayAgain() {
     push('/');
@@ -56,7 +48,7 @@
     {#if leaderboard.length > 0}
       <div class={styles.leaderboard}>
         <h2 class={styles.leaderboardTitle}>Leaderboard</h2>
-        {#each leaderboard as entry, index}
+        {#each leaderboard as entry, index (entry.player.id)}
           <div class="{styles.leaderboardItem} {index === 0 ? styles.firstPlace : ''}">
             <span class={styles.rank}>{getRankEmoji(index + 1)}</span>
             <span class={styles.playerName}>{entry.player.name}</span>
