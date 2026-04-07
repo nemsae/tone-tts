@@ -9,6 +9,8 @@
     SocketActionAck,
   } from '@/shared/lib/multiplayer-types';
   import { Button } from '@/shared/ui';
+  import { spacetimeDBProvider } from '@/shared/lib';
+  import { VoiceChatPanel } from '@/features/voice-chat';
   import styles from './multiplayer-lobby.module.scss';
 
   const MAX_ROOM_PLAYERS = 4;
@@ -18,6 +20,7 @@
   let isHost = $derived($multiplayerGameStore.player?.isHost ?? false);
   let isStartingGame = $state(false);
   let error = $state('');
+  let stdbConnected = $state(false);
 
   const socket = socketService.connect();
 
@@ -46,6 +49,15 @@
       multiplayerGameStore.handleGameStarted(data);
       push('/multiplayer-game');
     });
+
+    // Connect to SpacetimeDB for voice chat signaling
+    spacetimeDBProvider.onConnect(() => {
+      if (roomCode) {
+        spacetimeDBProvider.subscribeToRoom(roomCode);
+        stdbConnected = true;
+      }
+    });
+    spacetimeDBProvider.connect();
   });
 
   onDestroy(() => {
@@ -55,6 +67,7 @@
     socket.off('player-joined');
     socket.off('player-left');
     socket.off('game-started');
+    spacetimeDBProvider.disconnect();
   });
 
   function handleStartGame() {
@@ -70,6 +83,7 @@
   function handleBack() {
     multiplayerGameStore.reset();
     socketService.disconnect();
+    spacetimeDBProvider.disconnect();
     push('/');
   }
 </script>
@@ -109,6 +123,10 @@
         {/each}
       </div>
     </div>
+
+    {#if stdbConnected && roomCode}
+      <VoiceChatPanel roomCode={roomCode} />
+    {/if}
 
     {#if error}
       <div class={styles.error}>{error}</div>

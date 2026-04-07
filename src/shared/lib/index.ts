@@ -1,5 +1,12 @@
 export { normalizeText, levenshteinDistance, calculateSimilarity } from './string-utils';
 export { socketService } from './socket';
+export { spacetimeDBProvider, SpacetimeDBProvider } from './spacetimedb-provider';
+export type {
+  MuteState as STDBMuteState,
+  PeerSignal as STDBPeerSignal,
+  Player as STDBPlayer,
+  Room as STDBRoom,
+} from './spacetimedb-bindings/types';
 export {
   multiplayerGameStore,
   players,
