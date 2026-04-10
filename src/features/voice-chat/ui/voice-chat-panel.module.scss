@@ -1,0 +1,194 @@
+@use '../../../app/styles/variables' as *;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: $color-surface-container;
+  border-radius: $radius-xl;
+  border: 1px solid $color-outline-variant;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: $color-text;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $color-outline;
+
+  &.connected {
+    background: #2e7d32;
+  }
+
+  &.connecting {
+    background: #f9a825;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  &.error {
+    background: $color-error;
+  }
+}
+
+.peerList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.peerItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: $color-surface;
+  border-radius: $radius-md;
+  border: 2px solid transparent;
+  transition: border-color $transition-fast;
+
+  &.speaking {
+    border-color: #2e7d32;
+  }
+
+  &.localUser {
+    background: $color-surface-container-high;
+  }
+}
+
+.peerInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.speakingIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  flex-shrink: 0;
+  transition: background $transition-fast;
+
+  &.active {
+    background: #2e7d32;
+    box-shadow: 0 0 4px rgba(46, 125, 50, 0.5);
+  }
+}
+
+.peerName {
+  font-size: 13px;
+  font-weight: 500;
+  color: $color-text;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.youBadge {
+  font-size: 11px;
+  color: $color-text-muted;
+  font-weight: 400;
+}
+
+.peerStatus {
+  font-size: 11px;
+  color: $color-text-muted;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.muteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid $color-outline-variant;
+  background: $color-surface;
+  cursor: pointer;
+  transition: all $transition-fast;
+  color: $color-text;
+  padding: 0;
+
+  &:hover {
+    background: $color-surface-container-high;
+  }
+
+  &.muted {
+    background: $color-error;
+    border-color: $color-error;
+    color: white;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+}
+
+.peerMuteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: $color-text-muted;
+  padding: 0;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $color-surface-container-high;
+    color: $color-text;
+  }
+
+  &.muted {
+    color: $color-error;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+}
+
+.errorMsg {
+  font-size: 12px;
+  color: $color-error;
+  padding: 8px;
+  background: $color-error-container;
+  border-radius: $radius-md;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
