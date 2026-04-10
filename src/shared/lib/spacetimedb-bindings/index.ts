@@ -10,7 +10,6 @@ import {
   DbConnectionImpl as __DbConnectionImpl,
   SubscriptionBuilderImpl as __SubscriptionBuilderImpl,
   TypeBuilder as __TypeBuilder,
-  Uuid as __Uuid,
   convertToAccessorMap as __convertToAccessorMap,
   makeQueryBuilder as __makeQueryBuilder,
   procedureSchema as __procedureSchema,
@@ -31,7 +30,7 @@ import {
   type RemoteModule as __RemoteModule,
   type SubscriptionEventContextInterface as __SubscriptionEventContextInterface,
   type SubscriptionHandleImpl as __SubscriptionHandleImpl,
-} from 'spacetimedb/sdk';
+} from 'spacetimedb';
 
 // Import all reducer arg schemas
 import BulkSetMuteReducer from './bulk_set_mute_reducer';
